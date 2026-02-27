@@ -1,0 +1,30 @@
+:root {
+  --bg-main: #1e1e1e;
+  --bg-sidebar: #252526;
+  --bg-search: #2c2c2c;
+  --bg-hover: #2d2d30;
+  --bg-active: #37373d;
+  --text-primary: #ffffff;
+  --text-secondary: #e0e0e0;
+  --border-subtle: #3c3c3c;
+  --accent-shell: #0078d4;
+  --accent-desktop: #5c2d91;
+  --accent-jupyter: #f37726;
+  --accent-rstudio: #276dc2;
+  --accent-files: #107c10;
+  --accent-shared: #00b7c3;
+  --accent-common: #8764b8;
+  --accent-chat: #7b2cbf;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  margin: 0;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  background: var(--bg-main);
+  color: var(--text-primary);
+}
