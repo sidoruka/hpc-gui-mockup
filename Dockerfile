@@ -18,6 +18,7 @@ FROM alpine AS nginx-config
 ARG BASE_PATH=/app/
 COPY nginx.conf /root.conf
 COPY nginx.app.conf /app.conf
+RUN sed "s|__BASE_PATH__|${BASE_PATH}|g" /app.conf > /tmp/app.conf && mv /tmp/app.conf /app.conf
 RUN if [ "$BASE_PATH" = "/" ]; then cp /root.conf /out.conf; else cp /app.conf /out.conf; fi
 
 # Serve stage
