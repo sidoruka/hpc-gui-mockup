@@ -25,3 +25,19 @@ npm run build
 ```
 
 Output is in `dist/`.
+
+## Docker
+
+Build the image:
+
+```bash
+docker build -t hpc-mockup .
+```
+
+Run the container (serves the app on port 8080):
+
+```bash
+docker run -p 8080:80 hpc-mockup
+```
+
+Open http://localhost:8080 in your browser.
