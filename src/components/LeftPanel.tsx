@@ -40,22 +40,28 @@ const dataGroup: NavItem[] = [
 
 interface LeftPanelProps {
   collapsed: boolean;
+  width?: number;
+  isResizing?: boolean;
   onToggleSidebar: () => void;
   onOpenApp: (type: TabType) => void;
 }
 
-export function LeftPanel({ collapsed, onToggleSidebar, onOpenApp }: LeftPanelProps) {
+const EXPANDED_DEFAULT_WIDTH = 240;
+const COLLAPSED_WIDTH = 56;
+
+export function LeftPanel({ collapsed, width = EXPANDED_DEFAULT_WIDTH, isResizing = false, onToggleSidebar, onOpenApp }: LeftPanelProps) {
   return (
     <aside
       style={{
-        width: collapsed ? 56 : 240,
-        minWidth: collapsed ? 56 : 240,
+        width: collapsed ? COLLAPSED_WIDTH : width,
+        minWidth: collapsed ? COLLAPSED_WIDTH : undefined,
+        flexShrink: 0,
         background: 'var(--bg-sidebar)',
-        borderRight: '1px solid var(--border-subtle)',
+        borderRight: collapsed ? '1px solid var(--border-subtle)' : 'none',
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        transition: 'width 0.2s ease',
+        transition: isResizing ? 'none' : 'width 0.2s ease',
       }}
     >
       {!collapsed && (

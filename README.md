@@ -11,6 +11,14 @@ npm run dev
 
 Open the URL shown in the terminal (e.g. http://localhost:5173).
 
+To run the app under a URL path suffix (e.g. http://localhost:5174/myapp/):
+
+```bash
+BASE_PATH=/myapp/ npm run dev
+```
+
+Then open http://localhost:5174/myapp/.
+
 ## Features
 
 - **Left panel**: Apps (Shell, Desktop, Jupyter, RStudio) and Data (My files, Shared with me, Common data). Collapsible sidebar with search and user block.
@@ -26,17 +34,27 @@ npm run build
 
 Output is in `dist/`.
 
+To build for a URL path suffix (e.g. `/myapp/`), set `BASE_PATH` so asset URLs match your server path:
+
+```bash
+BASE_PATH=/myapp/ npm run build
+```
+
 ## Docker
 
-Build the image:
+By default the image is built to serve the app under `/app/`. Build and run:
 
 ```bash
 docker build -t hpc-mockup .
+docker run -p 8080:80 hpc-mockup
 ```
 
-Run the container (serves the app on port 8080):
+Open http://localhost:8080/app/ in your browser.
+
+To serve at the domain root instead of a path:
 
 ```bash
+docker build --build-arg BASE_PATH=/ -t hpc-mockup .
 docker run -p 8080:80 hpc-mockup
 ```
 
