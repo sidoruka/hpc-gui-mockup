@@ -71,6 +71,8 @@ interface RightPaneProps {
   activeSplitPane: 0 | 1;
   onSelectTab: (id: string) => void;
   onCloseTab: (id: string) => void;
+  onCloseAllTabs: () => void;
+  onCloseOtherTabs: (keepTabId: string) => void;
   onReorderTabs: (fromIndex: number, toIndex: number) => void;
   onToggleSplit: () => void;
   onSetSplitPane: (pane: 0 | 1) => void;
@@ -229,6 +231,8 @@ export function RightPane({
   activeSplitPane,
   onSelectTab,
   onCloseTab,
+  onCloseAllTabs,
+  onCloseOtherTabs,
   onReorderTabs,
   onToggleSplit,
   onSetSplitPane,
@@ -255,6 +259,8 @@ export function RightPane({
         splitView={splitView}
         onSelectTab={onSelectTab}
         onCloseTab={onCloseTab}
+        onCloseAllTabs={onCloseAllTabs}
+        onCloseOtherTabs={onCloseOtherTabs}
         onReorder={onReorderTabs}
         onToggleSplit={onToggleSplit}
       />

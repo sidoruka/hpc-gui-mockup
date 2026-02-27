@@ -28,6 +28,8 @@ export interface AppState {
 export type AppAction =
   | { type: 'OPEN_APP'; tabType: TabType; title: string }
   | { type: 'CLOSE_TAB'; tabId: string }
+  | { type: 'CLOSE_ALL_TABS' }
+  | { type: 'CLOSE_OTHER_TABS'; keepTabId: string }
   | { type: 'SET_ACTIVE_TAB'; tabId: string | null }
   | { type: 'REORDER_TABS'; fromIndex: number; toIndex: number }
   | { type: 'TOGGLE_SPLIT_VIEW' }
@@ -89,6 +91,25 @@ export function appReducer(state: AppState, action: AppAction): AppState {
         ];
       }
       return { ...state, openTabs, activeTabId, splitTabs };
+    }
+    case 'CLOSE_ALL_TABS':
+      return {
+        ...state,
+        openTabs: [],
+        activeTabId: null,
+        splitView: false,
+        splitTabs: [null, null],
+      };
+    case 'CLOSE_OTHER_TABS': {
+      const keep = state.openTabs.find((t) => t.id === action.keepTabId);
+      if (!keep || state.openTabs.length <= 1) return state;
+      return {
+        ...state,
+        openTabs: [keep],
+        activeTabId: keep.id,
+        splitView: false,
+        splitTabs: [keep.id, null],
+      };
     }
     case 'SET_ACTIVE_TAB': {
       if (state.splitView && action.tabId && state.activeSplitPane !== undefined) {

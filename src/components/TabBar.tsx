@@ -1,3 +1,4 @@
+import { useRef, useEffect, useState } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -17,12 +18,37 @@ import { CSS } from '@dnd-kit/utilities';
 import { X, Columns } from 'lucide-react';
 import type { Tab } from '../state/appState';
 
+const contextMenuStyle: React.CSSProperties = {
+  position: 'fixed',
+  background: 'var(--bg-sidebar)',
+  border: '1px solid var(--border-subtle)',
+  borderRadius: '6px',
+  boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+  minWidth: 180,
+  zIndex: 1000,
+  overflow: 'hidden',
+};
+
+const contextMenuItemStyle: React.CSSProperties = {
+  display: 'block',
+  width: '100%',
+  padding: '8px 12px',
+  textAlign: 'left',
+  border: 'none',
+  background: 'transparent',
+  color: 'var(--text-primary)',
+  cursor: 'pointer',
+  fontSize: '13px',
+};
+
 interface TabBarProps {
   tabs: Tab[];
   activeTabId: string | null;
   splitView: boolean;
   onSelectTab: (id: string) => void;
   onCloseTab: (id: string) => void;
+  onCloseAllTabs: () => void;
+  onCloseOtherTabs: (keepTabId: string) => void;
   onReorder: (fromIndex: number, toIndex: number) => void;
   onToggleSplit: () => void;
 }
@@ -32,11 +58,13 @@ function SortableTab({
   isActive,
   onSelect,
   onClose,
+  onContextMenu,
 }: {
   tab: Tab;
   isActive: boolean;
   onSelect: () => void;
   onClose: () => void;
+  onContextMenu: (e: React.MouseEvent) => void;
 }) {
   const {
     attributes,
@@ -71,6 +99,7 @@ function SortableTab({
         borderTopRightRadius: '6px',
       }}
       onClick={onSelect}
+      onContextMenu={onContextMenu}
       {...attributes}
       {...listeners}
     >
@@ -108,19 +137,37 @@ function SortableTab({
   );
 }
 
+type ContextMenuState = { x: number; y: number; tabId: string } | null;
+
 export function TabBar({
   tabs,
   activeTabId,
   splitView,
   onSelectTab,
   onCloseTab,
+  onCloseAllTabs,
+  onCloseOtherTabs,
   onReorder,
   onToggleSplit,
 }: TabBarProps) {
+  const [contextMenu, setContextMenu] = useState<ContextMenuState>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
+
+  useEffect(() => {
+    if (!contextMenu) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setContextMenu(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [contextMenu]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -132,6 +179,13 @@ export function TabBar({
       }
     }
   };
+
+  const handleTabContextMenu = (e: React.MouseEvent, tabId: string) => {
+    e.preventDefault();
+    setContextMenu({ x: e.clientX, y: e.clientY, tabId });
+  };
+
+  const showCloseOther = tabs.length > 1;
 
   return (
     <div
@@ -152,6 +206,7 @@ export function TabBar({
               isActive={activeTabId === tab.id}
               onSelect={() => onSelectTab(tab.id)}
               onClose={() => onCloseTab(tab.id)}
+              onContextMenu={(e) => handleTabContextMenu(e, tab.id)}
             />
           ))}
         </SortableContext>
@@ -179,6 +234,49 @@ export function TabBar({
           <Columns size={16} />
           Split
         </button>
+      )}
+      {contextMenu && (
+        <div
+          ref={menuRef}
+          style={{
+            ...contextMenuStyle,
+            left: contextMenu.x,
+            top: contextMenu.y,
+          }}
+        >
+          <button
+            type="button"
+            style={contextMenuItemStyle}
+            onClick={() => {
+              onCloseTab(contextMenu.tabId);
+              setContextMenu(null);
+            }}
+          >
+            Close
+          </button>
+          {showCloseOther && (
+            <button
+              type="button"
+              style={contextMenuItemStyle}
+              onClick={() => {
+                onCloseOtherTabs(contextMenu.tabId);
+                setContextMenu(null);
+              }}
+            >
+              Close other tabs
+            </button>
+          )}
+          <button
+            type="button"
+            style={contextMenuItemStyle}
+            onClick={() => {
+              onCloseAllTabs();
+              setContextMenu(null);
+            }}
+          >
+            Close all
+          </button>
+        </div>
       )}
     </div>
   );
