@@ -5,8 +5,6 @@ import {
   MessageCircle,
   Terminal,
   Monitor,
-  BookOpen,
-  Box,
   Folder,
   Share2,
   Database,
@@ -16,6 +14,8 @@ import {
 } from 'lucide-react';
 import type { TabType } from '../state/appState';
 import { getTitleForType } from '../state/appState';
+import { JupyterIcon } from './icons/JupyterIcon';
+import { RStudioIcon } from './icons/RStudioIcon';
 
 interface NavItem {
   type: TabType;
@@ -28,8 +28,8 @@ const chatItem: NavItem = { type: 'chat', icon: MessageCircle, color: 'var(--acc
 const appsGroup: NavItem[] = [
   { type: 'shell', icon: Terminal, color: 'var(--accent-shell)' },
   { type: 'desktop', icon: Monitor, color: 'var(--accent-desktop)' },
-  { type: 'jupyter', icon: BookOpen, color: 'var(--accent-jupyter)' },
-  { type: 'rstudio', icon: Box, color: 'var(--accent-rstudio)' },
+  { type: 'jupyter', icon: JupyterIcon, color: 'var(--accent-jupyter)' },
+  { type: 'rstudio', icon: RStudioIcon, color: 'var(--accent-rstudio)' },
 ];
 
 const dataGroup: NavItem[] = [
@@ -154,7 +154,11 @@ export function LeftPanel({ collapsed, onToggleSidebar, onOpenApp }: LeftPanelPr
                     flexShrink: 0,
                   }}
                 >
-                  <Icon size={16} color="#fff" />
+                  {type === 'rstudio' ? (
+                    <RStudioIcon size={16} color="#fff" circleColor={color} />
+                  ) : (
+                    <Icon size={16} color="#fff" />
+                  )}
                 </div>
                 {getTitleForType(type)}
               </button>
@@ -314,7 +318,11 @@ export function LeftPanel({ collapsed, onToggleSidebar, onOpenApp }: LeftPanelPr
                     justifyContent: 'center',
                   }}
                 >
-                  <Icon size={16} color="#fff" />
+                  {type === 'rstudio' ? (
+                    <RStudioIcon size={16} color="#fff" circleColor={color} />
+                  ) : (
+                    <Icon size={16} color="#fff" />
+                  )}
                 </div>
               </button>
             ))}

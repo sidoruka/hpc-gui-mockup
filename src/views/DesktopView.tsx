@@ -1,10 +1,20 @@
 import { Folder, Terminal, Globe, FileText } from 'lucide-react';
 
-const icons = [
+const SCHRODINGER_ICON =
+  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNkvvOFYYJRnCpXrRMcydHfuKEEcXsnXnrBQ&s';
+const MONOLIX_ICON =
+  'https://www.simulations-plus.com/wp-content/uploads/prod_icon_monolix.png';
+
+const icons: Array<
+  | { Icon: typeof Folder; label: string; color: string; iconSrc?: undefined }
+  | { Icon?: undefined; label: string; iconSrc: string; color?: undefined }
+> = [
   { Icon: Folder, label: 'Home', color: '#0078d4' },
   { Icon: Terminal, label: 'Terminal', color: '#107c10' },
   { Icon: Globe, label: 'Browser', color: '#5c2d91' },
   { Icon: FileText, label: 'Documents', color: '#d83b01' },
+  { label: 'Schrodinger', iconSrc: SCHRODINGER_ICON },
+  { label: 'Monolix', iconSrc: MONOLIX_ICON },
 ];
 
 export function DesktopView() {
@@ -28,9 +38,9 @@ export function DesktopView() {
           alignItems: 'start',
         }}
       >
-        {icons.map(({ Icon, label, color }) => (
+        {icons.map((item) => (
           <div
-            key={label}
+            key={item.label}
             style={{
               display: 'flex',
               flexDirection: 'column',
@@ -40,23 +50,32 @@ export function DesktopView() {
               padding: '8px',
               borderRadius: '4px',
             }}
-            title={label}
+            title={item.label}
           >
             <div
               style={{
                 width: 48,
                 height: 48,
                 borderRadius: '8px',
-                background: color,
+                background: 'iconSrc' in item ? 'var(--bg-active)' : item.color,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: '#fff',
+                overflow: 'hidden',
               }}
             >
-              <Icon size={28} />
+              {'iconSrc' in item ? (
+                <img
+                  src={item.iconSrc}
+                  alt=""
+                  style={{ width: 40, height: 40, objectFit: 'contain' }}
+                />
+              ) : (
+                <item.Icon size={28} />
+              )}
             </div>
-            <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{label}</span>
+            <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{item.label}</span>
           </div>
         ))}
       </div>

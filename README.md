@@ -1,6 +1,6 @@
 # Cloud-based HPC Mockup
 
-A clickable mockup web app for a Cloud-based HPC portal with an Office 365–style dark UI.
+A clickable mockup web app for a Cloud-based HPC portal with a dark UI.
 
 ## Run locally
 
