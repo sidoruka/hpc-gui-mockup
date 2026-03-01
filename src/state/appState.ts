@@ -4,6 +4,7 @@ export type TabType =
   | 'desktop'
   | 'jupyter'
   | 'rstudio'
+  | 'vscode'
   | 'my-files'
   | 'shared-with-me'
   | 'common-data';
@@ -35,6 +36,7 @@ const tabTypeTitles: Record<TabType, string> = {
   desktop: 'Desktop',
   jupyter: 'Jupyter',
   rstudio: 'RStudio',
+  vscode: 'VSCode',
   'my-files': 'My files',
   'shared-with-me': 'Shared with me',
   'common-data': 'Common data',

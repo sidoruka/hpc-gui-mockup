@@ -16,6 +16,7 @@ import type { TabType } from '../state/appState';
 import { getTitleForType } from '../state/appState';
 import { JupyterIcon } from './icons/JupyterIcon';
 import { RStudioIcon } from './icons/RStudioIcon';
+import { VSCodeIcon } from './icons/VSCodeIcon';
 
 interface NavItem {
   type: TabType;
@@ -30,6 +31,7 @@ const appsGroup: NavItem[] = [
   { type: 'desktop', icon: Monitor, color: 'var(--accent-desktop)' },
   { type: 'jupyter', icon: JupyterIcon, color: 'var(--accent-jupyter)' },
   { type: 'rstudio', icon: RStudioIcon, color: 'var(--accent-rstudio)' },
+  { type: 'vscode', icon: VSCodeIcon, color: 'var(--accent-vscode)' },
 ];
 
 const dataGroup: NavItem[] = [
@@ -162,6 +164,8 @@ export function LeftPanel({ collapsed, width = EXPANDED_DEFAULT_WIDTH, isResizin
                 >
                   {type === 'rstudio' ? (
                     <RStudioIcon size={16} color="#fff" circleColor={color} />
+                  ) : type === 'vscode' ? (
+                    <VSCodeIcon size={20} />
                   ) : (
                     <Icon size={16} color="#fff" />
                   )}
@@ -326,6 +330,8 @@ export function LeftPanel({ collapsed, width = EXPANDED_DEFAULT_WIDTH, isResizin
                 >
                   {type === 'rstudio' ? (
                     <RStudioIcon size={16} color="#fff" circleColor={color} />
+                  ) : type === 'vscode' ? (
+                    <VSCodeIcon size={20} />
                   ) : (
                     <Icon size={16} color="#fff" />
                   )}
