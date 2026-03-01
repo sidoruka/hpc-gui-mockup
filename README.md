@@ -24,8 +24,6 @@ Then open http://localhost:5174/myapp/.
 - **Left panel**: Apps (Shell, Desktop, Jupyter, RStudio) and Data (My files, Shared with me, Common data). Collapsible sidebar with search and user block.
 - **Right pane**: Tabbed content. Click a left menu item to open its view in a new tab.
 - **Tabs**: Reorder by drag-and-drop. Close via the × on each tab.
-- **Split view**: Use the "Split" button in the tab bar to show two panes side-by-side. Click a pane to focus it, then click a tab to assign it to that pane. Drag the divider to resize.
-
 ## Build
 
 ```bash

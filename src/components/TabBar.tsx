@@ -15,7 +15,7 @@ import {
   horizontalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { X, Columns } from 'lucide-react';
+import { X } from 'lucide-react';
 import type { Tab } from '../state/appState';
 
 const contextMenuStyle: React.CSSProperties = {
@@ -44,13 +44,11 @@ const contextMenuItemStyle: React.CSSProperties = {
 interface TabBarProps {
   tabs: Tab[];
   activeTabId: string | null;
-  splitView: boolean;
   onSelectTab: (id: string) => void;
   onCloseTab: (id: string) => void;
   onCloseAllTabs: () => void;
   onCloseOtherTabs: (keepTabId: string) => void;
   onReorder: (fromIndex: number, toIndex: number) => void;
-  onToggleSplit: () => void;
 }
 
 function SortableTab({
@@ -142,13 +140,11 @@ type ContextMenuState = { x: number; y: number; tabId: string } | null;
 export function TabBar({
   tabs,
   activeTabId,
-  splitView,
   onSelectTab,
   onCloseTab,
   onCloseAllTabs,
   onCloseOtherTabs,
   onReorder,
-  onToggleSplit,
 }: TabBarProps) {
   const [contextMenu, setContextMenu] = useState<ContextMenuState>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -211,30 +207,6 @@ export function TabBar({
           ))}
         </SortableContext>
       </DndContext>
-      {tabs.length > 0 && (
-        <button
-          type="button"
-          onClick={onToggleSplit}
-          title={splitView ? 'Single view' : 'Split view'}
-          style={{
-            marginLeft: '8px',
-            marginBottom: '6px',
-            padding: '6px 10px',
-            background: splitView ? 'var(--bg-active)' : 'transparent',
-            border: 'none',
-            borderRadius: '4px',
-            color: 'var(--text-secondary)',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-            fontSize: '12px',
-          }}
-        >
-          <Columns size={16} />
-          Split
-        </button>
-      )}
       {contextMenu && (
         <div
           ref={menuRef}
