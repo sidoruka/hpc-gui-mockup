@@ -4,6 +4,8 @@ const SCHRODINGER_ICON =
   'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNkvvOFYYJRnCpXrRMcydHfuKEEcXsnXnrBQ&s';
 const MONOLIX_ICON =
   'https://www.simulations-plus.com/wp-content/uploads/prod_icon_monolix.png';
+const MATLAB_ICON =
+  'https://upload.wikimedia.org/wikipedia/commons/4/4b/Matlab_icon.png';
 
 const icons: Array<
   | { Icon: typeof Folder; label: string; color: string; iconSrc?: undefined }
@@ -15,6 +17,7 @@ const icons: Array<
   { Icon: FileText, label: 'Documents', color: '#d83b01' },
   { label: 'Schrodinger', iconSrc: SCHRODINGER_ICON },
   { label: 'Monolix', iconSrc: MONOLIX_ICON },
+  { label: 'Matlab', iconSrc: MATLAB_ICON },
 ];
 
 export function DesktopView() {
