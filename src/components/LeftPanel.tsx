@@ -84,6 +84,7 @@ export function LeftPanel({
   onStopLaunchedApp,
 }: LeftPanelProps) {
   const [launchDialogOpen, setLaunchDialogOpen] = useState(false);
+  const [stopConfirmApp, setStopConfirmApp] = useState<LaunchedApp | null>(null);
 
   return (
     <aside
@@ -107,6 +108,82 @@ export function LeftPanel({
             setLaunchDialogOpen(false);
           }}
         />
+      )}
+      {stopConfirmApp && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="stop-confirm-title"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+          }}
+          onClick={() => setStopConfirmApp(null)}
+        >
+          <div
+            style={{
+              background: 'var(--bg-sidebar)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: '12px',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+              width: 'min(360px, 90vw)',
+              padding: '20px',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2
+              id="stop-confirm-title"
+              style={{ margin: '0 0 12px', fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)' }}
+            >
+              Stop application?
+            </h2>
+            <p style={{ margin: '0 0 20px', fontSize: '14px', color: 'var(--text-secondary)' }}>
+              Are you sure you want to stop <strong style={{ color: 'var(--text-primary)' }}>{stopConfirmApp.name}</strong>? Any
+              unsaved work may be lost.
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+              <button
+                type="button"
+                onClick={() => setStopConfirmApp(null)}
+                style={{
+                  padding: '8px 16px',
+                  background: 'transparent',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '8px',
+                  color: 'var(--text-primary)',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  onStopLaunchedApp(stopConfirmApp.id);
+                  setStopConfirmApp(null);
+                }}
+                style={{
+                  padding: '8px 16px',
+                  background: 'var(--accent-shell)',
+                  border: 'none',
+                  borderRadius: '8px',
+                  color: '#fff',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                }}
+              >
+                Stop
+              </button>
+            </div>
+          </div>
+        </div>
       )}
       {!collapsed && (
         <>
@@ -296,7 +373,7 @@ export function LeftPanel({
                       {!isLaunching && (
                         <button
                           type="button"
-                          onClick={() => onStopLaunchedApp(app.id)}
+                          onClick={() => setStopConfirmApp(app)}
                           title="Stop app"
                           style={{
                             flexShrink: 0,
