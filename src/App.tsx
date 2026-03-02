@@ -5,6 +5,7 @@ import {
   appReducer,
   initialState,
   getTitleForType,
+  generateLaunchedAppId,
   type TabType,
 } from './state/appState';
 import './styles/theme.css';
@@ -19,9 +20,35 @@ function App() {
   const [isResizing, setIsResizing] = useState(false);
   const resizeStartX = useRef(0);
   const resizeStartWidth = useRef(0);
+  const launchReadyTimeouts = useRef<ReturnType<typeof setTimeout>[]>([]);
 
-  const openApp = useCallback((type: TabType) => {
-    dispatch({ type: 'OPEN_APP', tabType: type, title: getTitleForType(type) });
+  useEffect(() => {
+    return () => {
+      launchReadyTimeouts.current.forEach(clearTimeout);
+    };
+  }, []);
+
+  const openApp = useCallback((type: TabType, launchedAppId?: string) => {
+    if (type === 'launched' && launchedAppId) {
+      const title = ''; // reducer will resolve from launchedApps
+      dispatch({ type: 'OPEN_APP', tabType: 'launched', title, launchedAppId });
+    } else {
+      dispatch({ type: 'OPEN_APP', tabType: type, title: getTitleForType(type) });
+    }
+  }, []);
+
+  const launchApp = useCallback((catalogAppId: string) => {
+    const launchedAppId = generateLaunchedAppId();
+    dispatch({ type: 'LAUNCH_APP', catalogAppId, launchedAppId });
+    const t = setTimeout(() => {
+      dispatch({ type: 'LAUNCHED_APP_READY', launchedAppId });
+      launchReadyTimeouts.current = launchReadyTimeouts.current.filter((id) => id !== t);
+    }, 5000);
+    launchReadyTimeouts.current.push(t);
+  }, []);
+
+  const stopLaunchedApp = useCallback((launchedAppId: string) => {
+    dispatch({ type: 'STOP_LAUNCHED_APP', launchedAppId });
   }, []);
 
   const handleResizeStart = useCallback((e: React.MouseEvent) => {
@@ -62,6 +89,9 @@ function App() {
         isResizing={isResizing}
         onToggleSidebar={() => dispatch({ type: 'TOGGLE_SIDEBAR' })}
         onOpenApp={openApp}
+        launchedApps={state.launchedApps}
+        onLaunchApp={launchApp}
+        onStopLaunchedApp={stopLaunchedApp}
       />
       {!state.sidebarCollapsed && (
         <div
@@ -82,6 +112,7 @@ function App() {
       <RightPane
         openTabs={state.openTabs}
         activeTabId={state.activeTabId}
+        launchedApps={state.launchedApps}
         onSelectTab={(id) => dispatch({ type: 'SET_ACTIVE_TAB', tabId: id })}
         onCloseTab={(id) => dispatch({ type: 'CLOSE_TAB', tabId: id })}
         onCloseAllTabs={() => dispatch({ type: 'CLOSE_ALL_TABS' })}

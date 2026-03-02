@@ -1,7 +1,7 @@
 import { MessageCircle } from 'lucide-react';
 import { TabBar } from './TabBar';
 import { TabContent } from '../views';
-import type { Tab } from '../state/appState';
+import type { Tab, LaunchedApp } from '../state/appState';
 
 function EmptyState({ onOpenChat }: { onOpenChat: () => void }) {
   return (
@@ -64,6 +64,7 @@ function EmptyState({ onOpenChat }: { onOpenChat: () => void }) {
 interface RightPaneProps {
   openTabs: Tab[];
   activeTabId: string | null;
+  launchedApps: LaunchedApp[];
   onSelectTab: (id: string) => void;
   onCloseTab: (id: string) => void;
   onCloseAllTabs: () => void;
@@ -77,10 +78,10 @@ function getTabById(tabs: Tab[], id: string | null): Tab | null {
   return tabs.find((t) => t.id === id) ?? null;
 }
 
-function SingleContent({ tab }: { tab: Tab }) {
+function SingleContent({ tab, launchedApps }: { tab: Tab; launchedApps: LaunchedApp[] }) {
   return (
     <div style={{ height: '100%', overflow: 'auto' }}>
-      <TabContent tabType={tab.type} />
+      <TabContent tabType={tab.type} tab={tab} launchedApps={launchedApps} />
     </div>
   );
 }
@@ -88,6 +89,7 @@ function SingleContent({ tab }: { tab: Tab }) {
 export function RightPane({
   openTabs,
   activeTabId,
+  launchedApps,
   onSelectTab,
   onCloseTab,
   onCloseAllTabs,
@@ -118,7 +120,7 @@ export function RightPane({
       />
       <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
         {activeTab ? (
-          <SingleContent tab={activeTab} />
+          <SingleContent tab={activeTab} launchedApps={launchedApps} />
         ) : (
           <EmptyState onOpenChat={onOpenChat} />
         )}

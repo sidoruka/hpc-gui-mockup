@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   LayoutGrid,
   Search,
@@ -11,12 +11,17 @@ import {
   User,
   PanelLeftClose,
   PanelLeftOpen,
+  Rocket,
+  Square,
+  Loader2,
 } from 'lucide-react';
-import type { TabType } from '../state/appState';
+import type { TabType, LaunchedApp } from '../state/appState';
 import { getTitleForType } from '../state/appState';
 import { JupyterIcon } from './icons/JupyterIcon';
 import { RStudioIcon } from './icons/RStudioIcon';
 import { VSCodeIcon } from './icons/VSCodeIcon';
+import { LaunchDialog } from './LaunchDialog';
+import { launchableAppIconMap } from './launchableAppIcons';
 
 interface NavItem {
   type: TabType;
@@ -45,13 +50,41 @@ interface LeftPanelProps {
   width?: number;
   isResizing?: boolean;
   onToggleSidebar: () => void;
-  onOpenApp: (type: TabType) => void;
+  onOpenApp: (type: TabType, launchedAppId?: string) => void;
+  launchedApps: LaunchedApp[];
+  onLaunchApp: (catalogAppId: string) => void;
+  onStopLaunchedApp: (launchedAppId: string) => void;
 }
 
 const EXPANDED_DEFAULT_WIDTH = 240;
 const COLLAPSED_WIDTH = 56;
 
-export function LeftPanel({ collapsed, width = EXPANDED_DEFAULT_WIDTH, isResizing = false, onToggleSidebar, onOpenApp }: LeftPanelProps) {
+const navButtonStyle = {
+  width: '100%' as const,
+  display: 'flex' as const,
+  alignItems: 'center' as const,
+  gap: '12px',
+  padding: '10px 12px',
+  background: 'transparent',
+  border: 'none',
+  color: 'var(--text-primary)',
+  cursor: 'pointer',
+  fontSize: '14px',
+  textAlign: 'left' as const,
+};
+
+export function LeftPanel({
+  collapsed,
+  width = EXPANDED_DEFAULT_WIDTH,
+  isResizing = false,
+  onToggleSidebar,
+  onOpenApp,
+  launchedApps,
+  onLaunchApp,
+  onStopLaunchedApp,
+}: LeftPanelProps) {
+  const [launchDialogOpen, setLaunchDialogOpen] = useState(false);
+
   return (
     <aside
       style={{
@@ -66,6 +99,15 @@ export function LeftPanel({ collapsed, width = EXPANDED_DEFAULT_WIDTH, isResizin
         transition: isResizing ? 'none' : 'width 0.2s ease',
       }}
     >
+      {launchDialogOpen && (
+        <LaunchDialog
+          onClose={() => setLaunchDialogOpen(false)}
+          onLaunch={(catalogAppId) => {
+            onLaunchApp(catalogAppId);
+            setLaunchDialogOpen(false);
+          }}
+        />
+      )}
       {!collapsed && (
         <>
           <div
@@ -131,24 +173,113 @@ export function LeftPanel({ collapsed, width = EXPANDED_DEFAULT_WIDTH, isResizin
               <LayoutGrid size={18} color="var(--text-secondary)" />
               <span style={{ fontWeight: 600, fontSize: '13px' }}>Apps</span>
             </div>
+            <button
+              type="button"
+              onClick={() => setLaunchDialogOpen(true)}
+              style={navButtonStyle}
+            >
+              <div
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: '6px',
+                  background: 'var(--accent-launch)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <Rocket size={16} color="#fff" />
+              </div>
+              Launch
+            </button>
+            {launchedApps.map((app) => {
+              const Icon = launchableAppIconMap[app.iconKey];
+              const IconComponent = Icon ?? Terminal;
+              const isLaunching = app.status === 'launching';
+              return (
+                <div
+                  key={app.id}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    width: '100%',
+                    gap: '4px',
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={isLaunching ? undefined : () => onOpenApp('launched', app.id)}
+                    disabled={isLaunching}
+                    style={{
+                      ...navButtonStyle,
+                      flex: 1,
+                      minWidth: 0,
+                      opacity: isLaunching ? 0.7 : 1,
+                      cursor: isLaunching ? 'not-allowed' : 'pointer',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: '6px',
+                        background: 'var(--accent-launch)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {isLaunching ? (
+                        <Loader2 size={16} color="#fff" style={{ animation: 'spin 1s linear infinite' }} />
+                      ) : (
+                        <IconComponent size={16} color="#fff" />
+                      )}
+                    </div>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {app.name}
+                    </span>
+                  </button>
+                  {!isLaunching && (
+                    <button
+                      type="button"
+                      onClick={() => onStopLaunchedApp(app.id)}
+                      title="Stop app"
+                      style={{
+                        flexShrink: 0,
+                        padding: '6px',
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--text-secondary)',
+                        cursor: 'pointer',
+                        borderRadius: '4px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'var(--bg-hover)';
+                        e.currentTarget.style.color = 'var(--text-primary)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
+                        e.currentTarget.style.color = 'var(--text-secondary)';
+                      }}
+                    >
+                      <Square size={14} fill="currentColor" />
+                    </button>
+                  )}
+                </div>
+              );
+            })}
             {appsGroup.map(({ type, icon: Icon, color }) => (
               <button
                 key={type}
                 type="button"
                 onClick={() => onOpenApp(type)}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '10px 12px',
-                  background: 'transparent',
-                  border: 'none',
-                  color: 'var(--text-primary)',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  textAlign: 'left',
-                }}
+                style={navButtonStyle}
               >
                 <div
                   style={{
@@ -298,6 +429,82 @@ export function LeftPanel({ collapsed, width = EXPANDED_DEFAULT_WIDTH, isResizin
                 <MessageCircle size={16} color="#fff" />
               </div>
             </button>
+            <button
+              type="button"
+              onClick={() => setLaunchDialogOpen(true)}
+              title="Launch"
+              style={{
+                width: 40,
+                height: 40,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'transparent',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                flexShrink: 0,
+              }}
+            >
+              <div
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: '6px',
+                  background: 'var(--accent-launch)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Rocket size={16} color="#fff" />
+              </div>
+            </button>
+            {launchedApps.map((app) => {
+              const Icon = launchableAppIconMap[app.iconKey];
+              const IconComponent = Icon ?? Terminal;
+              const isLaunching = app.status === 'launching';
+              return (
+                <button
+                  key={app.id}
+                  type="button"
+                  onClick={isLaunching ? undefined : () => onOpenApp('launched', app.id)}
+                  disabled={isLaunching}
+                  title={app.name}
+                  style={{
+                    width: 40,
+                    height: 40,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'transparent',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: isLaunching ? 'not-allowed' : 'pointer',
+                    flexShrink: 0,
+                    opacity: isLaunching ? 0.7 : 1,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: '6px',
+                      background: 'var(--accent-launch)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {isLaunching ? (
+                      <Loader2 size={16} color="#fff" style={{ animation: 'spin 1s linear infinite' }} />
+                    ) : (
+                      <IconComponent size={16} color="#fff" />
+                    )}
+                  </div>
+                </button>
+              );
+            })}
             {appsGroup.map(({ type, icon: Icon, color }) => (
               <button
                 key={type}
