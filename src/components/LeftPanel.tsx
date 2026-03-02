@@ -14,6 +14,8 @@ import {
   Plus,
   Square,
   Loader2,
+  Workflow,
+  List,
 } from 'lucide-react';
 import type { TabType, LaunchedApp } from '../state/appState';
 import { getTitleForType } from '../state/appState';
@@ -404,6 +406,56 @@ export function LeftPanel({
                 })}
               </>
             )}
+            <div
+              style={{
+                padding: '16px 12px 8px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+            >
+              <Workflow size={18} color="var(--text-secondary)" />
+              <span style={{ fontWeight: 600, fontSize: '13px' }}>Pipelines</span>
+            </div>
+            {[
+              { label: 'All pipelines', icon: Workflow, tabType: 'all-pipelines' as const },
+              { label: 'Runs', icon: List, tabType: null },
+            ].map(({ label, icon: Icon, tabType }) => (
+              <button
+                key={label}
+                type="button"
+                onClick={() => { if (tabType) onOpenApp(tabType); }}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '10px 12px',
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-primary)',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  textAlign: 'left',
+                }}
+              >
+                <div
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: '6px',
+                    background: 'var(--accent-launch)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <Icon size={16} color="#fff" />
+                </div>
+                {label}
+              </button>
+            ))}
             <div
               style={{
                 padding: '16px 12px 8px',

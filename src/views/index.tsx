@@ -6,6 +6,7 @@ import { JupyterView } from './JupyterView';
 import { RStudioView } from './RStudioView';
 import { VSCodeView } from './VSCodeView';
 import { FileBrowserView } from './FileBrowserView';
+import { AllPipelinesView } from './AllPipelinesView';
 
 interface TabContentProps {
   tabType: TabType;
@@ -34,6 +35,8 @@ export function TabContent({ tabType, tab, launchedApps = [] }: TabContentProps)
       return <RStudioView />;
     case 'vscode':
       return <VSCodeView />;
+    case 'all-pipelines':
+      return <AllPipelinesView />;
     case 'my-files':
     case 'shared-with-me':
     case 'common-data':

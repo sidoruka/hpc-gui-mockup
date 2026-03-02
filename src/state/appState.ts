@@ -6,6 +6,7 @@ export type TabType =
   | 'rstudio'
   | 'vscode'
   | 'launched'
+  | 'all-pipelines'
   | 'my-files'
   | 'shared-with-me'
   | 'common-data';
@@ -56,6 +57,7 @@ const tabTypeTitles: Record<Exclude<TabType, 'launched'>, string> = {
   jupyter: 'Jupyter',
   rstudio: 'RStudio',
   vscode: 'VSCode',
+  'all-pipelines': 'Pipelines',
   'my-files': 'My files',
   'shared-with-me': 'Shared with me',
   'common-data': 'Common data',
