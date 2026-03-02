@@ -16,6 +16,8 @@ import {
   Loader2,
   Workflow,
   List,
+  ChevronDown,
+  ChevronRight,
 } from 'lucide-react';
 import type { TabType, LaunchedApp } from '../state/appState';
 import { getTitleForType } from '../state/appState';
@@ -87,6 +89,14 @@ export function LeftPanel({
 }: LeftPanelProps) {
   const [launchDialogOpen, setLaunchDialogOpen] = useState(false);
   const [stopConfirmApp, setStopConfirmApp] = useState<LaunchedApp | null>(null);
+  const [sectionsExpanded, setSectionsExpanded] = useState({
+    apps: false,
+    pipelines: false,
+    data: false,
+  });
+
+  const toggleSection = (key: keyof typeof sectionsExpanded) =>
+    setSectionsExpanded((prev) => ({ ...prev, [key]: !prev[key] }));
 
   return (
     <aside
@@ -256,8 +266,32 @@ export function LeftPanel({
                 gap: '8px',
               }}
             >
-              <LayoutGrid size={18} color="var(--text-secondary)" />
-              <span style={{ fontWeight: 600, fontSize: '13px', flex: 1 }}>Apps</span>
+              <button
+                type="button"
+                onClick={() => toggleSection('apps')}
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: 0,
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-primary)',
+                  cursor: 'pointer',
+                  minWidth: 0,
+                }}
+              >
+                {sectionsExpanded.apps ? (
+                  <ChevronDown size={16} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
+                ) : (
+                  <ChevronRight size={16} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
+                )}
+                <LayoutGrid size={18} color="var(--text-secondary)" />
+                <span style={{ fontWeight: 600, fontSize: '13px' }}>
+                  Apps ({appsGroup.length + launchedApps.length})
+                </span>
+              </button>
               <button
                 type="button"
                 onClick={() => setLaunchDialogOpen(true)}
@@ -285,6 +319,8 @@ export function LeftPanel({
                 <Plus size={18} />
               </button>
             </div>
+            {sectionsExpanded.apps && (
+              <>
             {appsGroup.map(({ type, icon: Icon, color }) => (
               <button
                 key={type}
@@ -406,17 +442,34 @@ export function LeftPanel({
                 })}
               </>
             )}
-            <div
+              </>
+            )}
+            <button
+              type="button"
+              onClick={() => toggleSection('pipelines')}
               style={{
+                width: '100%',
                 padding: '16px 12px 8px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-primary)',
+                cursor: 'pointer',
+                textAlign: 'left',
               }}
             >
+              {sectionsExpanded.pipelines ? (
+                <ChevronDown size={16} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
+              ) : (
+                <ChevronRight size={16} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
+              )}
               <Workflow size={18} color="var(--text-secondary)" />
               <span style={{ fontWeight: 600, fontSize: '13px' }}>Pipelines</span>
-            </div>
+            </button>
+            {sectionsExpanded.pipelines && (
+            <>
             {[
               { label: 'All pipelines', icon: Workflow, tabType: 'all-pipelines' as const },
               { label: 'Runs', icon: List, tabType: null },
@@ -456,17 +509,34 @@ export function LeftPanel({
                 {label}
               </button>
             ))}
-            <div
+            </>
+            )}
+            <button
+              type="button"
+              onClick={() => toggleSection('data')}
               style={{
+                width: '100%',
                 padding: '16px 12px 8px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-primary)',
+                cursor: 'pointer',
+                textAlign: 'left',
               }}
             >
+              {sectionsExpanded.data ? (
+                <ChevronDown size={16} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
+              ) : (
+                <ChevronRight size={16} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
+              )}
               <Folder size={18} color="var(--text-secondary)" />
               <span style={{ fontWeight: 600, fontSize: '13px' }}>Data</span>
-            </div>
+            </button>
+            {sectionsExpanded.data && (
+            <>
             {dataGroup.map(({ type, icon: Icon, color }) => (
               <button
                 key={type}
@@ -503,6 +573,8 @@ export function LeftPanel({
                 {getTitleForType(type)}
               </button>
             ))}
+            </>
+            )}
           </nav>
           <div
             style={{
