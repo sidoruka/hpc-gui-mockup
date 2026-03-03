@@ -24,6 +24,7 @@ import { JupyterIcon } from './icons/JupyterIcon';
 import { RStudioIcon } from './icons/RStudioIcon';
 import { VSCodeIcon } from './icons/VSCodeIcon';
 import { LaunchDialog } from './LaunchDialog';
+import { UsageStatsDialog } from './UsageStatsDialog';
 import { LeftPaneNavIcon } from './LeftPaneNavIcon';
 import { launchableAppIconMap } from './launchableAppIcons';
 import { runningPipelinesCount } from '../views/RunsView';
@@ -94,6 +95,7 @@ export function LeftPanel({
   const [openMenuAppId, setOpenMenuAppId] = useState<string | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [appearanceSubmenuOpen, setAppearanceSubmenuOpen] = useState(false);
+  const [usageStatsOpen, setUsageStatsOpen] = useState(false);
   const menuContainerRef = useRef<HTMLDivElement | null>(null);
   const userMenuRef = useRef<HTMLDivElement | null>(null);
 
@@ -155,6 +157,9 @@ export function LeftPanel({
             setLaunchDialogOpen(false);
           }}
         />
+      )}
+      {usageStatsOpen && (
+        <UsageStatsDialog onClose={() => setUsageStatsOpen(false)} />
       )}
       {stopConfirmApp && (
         <div
@@ -827,7 +832,10 @@ export function LeftPanel({
                       </button>
                       <button
                         type="button"
-                        onClick={() => setUserMenuOpen(false)}
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          setUsageStatsOpen(true);
+                        }}
                         style={{
                           width: '100%',
                           padding: '8px 12px',
@@ -1252,7 +1260,10 @@ export function LeftPanel({
                       </button>
                       <button
                         type="button"
-                        onClick={() => setUserMenuOpen(false)}
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          setUsageStatsOpen(true);
+                        }}
                         style={{
                           width: '100%',
                           padding: '8px 12px',
