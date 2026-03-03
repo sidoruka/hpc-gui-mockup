@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   Folder,
   FolderOpen,
@@ -10,6 +10,10 @@ import {
   Database,
   PanelRightClose,
   PanelRightOpen,
+  Copy,
+  Download,
+  Pencil,
+  Trash2,
 } from 'lucide-react';
 import type { TabType } from '../state/appState';
 
@@ -85,6 +89,55 @@ export type DataSectionId = 'my-files' | 'shared-with-me' | 'common-data';
 /** MIME type for drag from file explorer; data: JSON { sectionId, relativePath } */
 export const FILE_EXPLORER_DRAG_TYPE = 'application/x-hpc-explorer-path';
 
+type ContextMenuState = {
+  x: number;
+  y: number;
+  fullPath: string;
+  sectionId: DataSectionId;
+  nodeName: string;
+  isFile: boolean;
+} | null;
+
+/** Path within section e.g. "documents/report.pdf" -> ["documents", "report.pdf"] */
+function pathPartsWithinSection(fullPath: string, sectionId: DataSectionId): string[] {
+  const prefix = sectionId + '/';
+  const within = fullPath.startsWith(prefix) ? fullPath.slice(prefix.length) : fullPath;
+  return within ? within.split('/') : [];
+}
+
+function cloneTree(nodes: FileTreeNode[]): FileTreeNode[] {
+  return nodes.map((n) => ({
+    ...n,
+    children: n.children ? cloneTree(n.children) : undefined,
+  }));
+}
+
+function renameNodeInTree(nodes: FileTreeNode[], pathParts: string[], newName: string): FileTreeNode[] {
+  if (pathParts.length === 0) return nodes;
+  const [head, ...rest] = pathParts;
+  return nodes.map((node) => {
+    if (node.name !== head) return node;
+    if (rest.length === 0) return { ...node, name: newName };
+    return {
+      ...node,
+      children: node.children ? renameNodeInTree(node.children, rest, newName) : undefined,
+    };
+  });
+}
+
+function deleteNodeInTree(nodes: FileTreeNode[], pathParts: string[]): FileTreeNode[] {
+  if (pathParts.length === 0) return nodes;
+  const [head, ...rest] = pathParts;
+  if (rest.length === 0) return nodes.filter((n) => n.name !== head);
+  return nodes.map((node) => {
+    if (node.name !== head) return node;
+    return {
+      ...node,
+      children: node.children ? deleteNodeInTree(node.children, rest) : undefined,
+    };
+  });
+}
+
 interface FileExplorerPanelProps {
   collapsed: boolean;
   width: number;
@@ -100,6 +153,20 @@ const MIN_WIDTH = 200;
 const MAX_WIDTH = 420;
 const COLLAPSED_WIDTH = 48;
 
+const menuItemStyle: React.CSSProperties = {
+  width: '100%',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  padding: '6px 12px',
+  background: 'transparent',
+  border: 'none',
+  color: 'var(--text-primary, #e0e0e0)',
+  cursor: 'pointer',
+  fontSize: '13px',
+  textAlign: 'left',
+};
+
 function TreeItem({
   node,
   depth,
@@ -108,6 +175,7 @@ function TreeItem({
   expanded,
   onToggle,
   onOpenFile,
+  onContextMenu,
 }: {
   node: FileTreeNode;
   depth: number;
@@ -117,6 +185,7 @@ function TreeItem({
   expanded: Record<string, boolean>;
   onToggle: (path: string) => void;
   onOpenFile?: (filePath: string) => void;
+  onContextMenu?: (e: React.MouseEvent, payload: { fullPath: string; sectionId: DataSectionId; nodeName: string; isFile: boolean }) => void;
 }) {
   const isFile = node.isFile === true || (node.children?.length === 0 && !node.children);
   const hasChildren = node.children && node.children.length > 0;
@@ -146,6 +215,11 @@ function TreeItem({
         draggable
         onDragStart={handleDragStart}
         onClick={handleClick}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onContextMenu?.(e, { fullPath, sectionId, nodeName: node.name, isFile: !!isFile });
+        }}
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleClick()}
         style={{
           display: 'flex',
@@ -204,6 +278,7 @@ function TreeItem({
               expanded={expanded}
               onToggle={onToggle}
               onOpenFile={onOpenFile}
+              onContextMenu={onContextMenu}
             />
           ))}
         </div>
@@ -211,6 +286,11 @@ function TreeItem({
     </div>
   );
 }
+
+const initialTree = (): Record<DataSectionId, FileTreeNode[]> =>
+  Object.fromEntries(
+    (Object.keys(MOCK_TREE) as DataSectionId[]).map((id) => [id, cloneTree(MOCK_TREE[id])])
+  ) as Record<DataSectionId, FileTreeNode[]>;
 
 export function FileExplorerPanel({
   collapsed,
@@ -226,6 +306,85 @@ export function FileExplorerPanel({
     'common-data': false,
   });
   const [treeExpanded, setTreeExpanded] = useState<Record<string, boolean>>({});
+  const [treeData, setTreeData] = useState<Record<DataSectionId, FileTreeNode[]>>(initialTree);
+  const [contextMenu, setContextMenu] = useState<ContextMenuState>(null);
+
+  const closeContextMenu = useCallback(() => setContextMenu(null), []);
+
+  useEffect(() => {
+    if (!contextMenu) return;
+    const onGlobalClick = () => closeContextMenu();
+    window.addEventListener('click', onGlobalClick);
+    return () => window.removeEventListener('click', onGlobalClick);
+  }, [contextMenu, closeContextMenu]);
+
+  const handleContextMenu = useCallback(
+    (e: React.MouseEvent, payload: { fullPath: string; sectionId: DataSectionId; nodeName: string; isFile: boolean }) => {
+      setContextMenu({
+        x: e.clientX,
+        y: e.clientY,
+        fullPath: payload.fullPath,
+        sectionId: payload.sectionId,
+        nodeName: payload.nodeName,
+        isFile: payload.isFile,
+      });
+    },
+    []
+  );
+
+  const copyPath = useCallback(() => {
+    if (!contextMenu) return;
+    navigator.clipboard.writeText(contextMenu.fullPath);
+    closeContextMenu();
+  }, [contextMenu, closeContextMenu]);
+
+  const copyLinuxPath = useCallback(() => {
+    if (!contextMenu) return;
+    const linuxPath = `/home/user/${contextMenu.fullPath}`;
+    navigator.clipboard.writeText(linuxPath);
+    closeContextMenu();
+  }, [contextMenu, closeContextMenu]);
+
+  const download = useCallback(() => {
+    if (!contextMenu) return;
+    const blob = new Blob([`Mock content for ${contextMenu.fullPath}`], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = contextMenu.nodeName;
+    a.click();
+    URL.revokeObjectURL(url);
+    closeContextMenu();
+  }, [contextMenu, closeContextMenu]);
+
+  const rename = useCallback(() => {
+    if (!contextMenu) return;
+    const newName = window.prompt('Rename', contextMenu.nodeName);
+    if (newName == null || newName.trim() === '' || newName === contextMenu.nodeName) {
+      closeContextMenu();
+      return;
+    }
+    const pathParts = pathPartsWithinSection(contextMenu.fullPath, contextMenu.sectionId);
+    setTreeData((prev) => ({
+      ...prev,
+      [contextMenu.sectionId]: renameNodeInTree(prev[contextMenu.sectionId], pathParts, newName.trim()),
+    }));
+    closeContextMenu();
+  }, [contextMenu, closeContextMenu]);
+
+  const deleteItem = useCallback(() => {
+    if (!contextMenu) return;
+    if (!window.confirm(`Delete "${contextMenu.nodeName}"?`)) {
+      closeContextMenu();
+      return;
+    }
+    const pathParts = pathPartsWithinSection(contextMenu.fullPath, contextMenu.sectionId);
+    setTreeData((prev) => ({
+      ...prev,
+      [contextMenu.sectionId]: deleteNodeInTree(prev[contextMenu.sectionId], pathParts),
+    }));
+    closeContextMenu();
+  }, [contextMenu, closeContextMenu]);
 
   const toggleSection = (id: DataSectionId) =>
     setSectionsExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -294,7 +453,7 @@ export function FileExplorerPanel({
       <div style={{ flex: 1, overflow: 'auto', padding: '4px 0' }}>
         {SECTION_CONFIG.map(({ id, label, icon: Icon }) => {
           const isExpanded = sectionsExpanded[id];
-          const nodes = MOCK_TREE[id];
+          const nodes = treeData[id];
           return (
             <div key={id} style={{ marginBottom: '4px' }}>
               <button
@@ -340,6 +499,7 @@ export function FileExplorerPanel({
                       expanded={treeExpanded}
                       onToggle={toggleTreePath}
                       onOpenFile={onOpenFile}
+                      onContextMenu={handleContextMenu}
                     />
                   ))}
                 </div>
@@ -348,6 +508,82 @@ export function FileExplorerPanel({
           );
         })}
       </div>
+      {contextMenu && (
+        <div
+          role="menu"
+          style={{
+            position: 'fixed',
+            left: contextMenu.x,
+            top: contextMenu.y,
+            zIndex: 10000,
+            minWidth: 180,
+            padding: '4px 0',
+            background: 'var(--bg-dropdown, #2d2d2d)',
+            border: '1px solid var(--border-subtle, #444)',
+            borderRadius: '6px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+            fontSize: '13px',
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            type="button"
+            role="menuitem"
+            onClick={copyPath}
+            style={menuItemStyle}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-hover)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+          >
+            <Copy size={14} style={{ flexShrink: 0 }} />
+            Copy path
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={copyLinuxPath}
+            style={menuItemStyle}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-hover)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+          >
+            <Copy size={14} style={{ flexShrink: 0 }} />
+            Copy linux path
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={download}
+            style={menuItemStyle}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-hover)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+          >
+            <Download size={14} style={{ flexShrink: 0 }} />
+            Download
+          </button>
+          <div style={{ height: 1, background: 'var(--border-subtle, #444)', margin: '4px 8px' }} />
+          <button
+            type="button"
+            role="menuitem"
+            onClick={rename}
+            style={menuItemStyle}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-hover)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+          >
+            <Pencil size={14} style={{ flexShrink: 0 }} />
+            Rename
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={deleteItem}
+            style={menuItemStyle}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-hover)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+          >
+            <Trash2 size={14} style={{ flexShrink: 0 }} />
+            Delete
+          </button>
+        </div>
+      )}
       <div
         style={{
           padding: '8px',
