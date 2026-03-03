@@ -2,6 +2,12 @@ import { useReducer, useCallback, useRef, useEffect, useState } from 'react';
 import { LeftPanel } from './components/LeftPanel';
 import { RightPane } from './components/RightPane';
 import {
+  FileExplorerPanel,
+  FILE_EXPLORER_DEFAULT_WIDTH,
+  FILE_EXPLORER_MIN_WIDTH,
+  FILE_EXPLORER_MAX_WIDTH,
+} from './components/FileExplorerPanel';
+import {
   appReducer,
   initialState,
   getTitleForType,
@@ -17,7 +23,9 @@ const DEFAULT_SIDEBAR_WIDTH = 240;
 function App() {
   const [state, dispatch] = useReducer(appReducer, initialState);
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
+  const [rightPanelWidth, setRightPanelWidth] = useState(FILE_EXPLORER_DEFAULT_WIDTH);
   const [isResizing, setIsResizing] = useState(false);
+  const [isResizingRight, setIsResizingRight] = useState(false);
   const resizeStartX = useRef(0);
   const resizeStartWidth = useRef(0);
   const launchReadyTimeouts = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -74,6 +82,32 @@ function App() {
     };
   }, [isResizing]);
 
+  const handleRightResizeStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizingRight(true);
+    resizeStartX.current = e.clientX;
+    resizeStartWidth.current = rightPanelWidth;
+  }, [rightPanelWidth]);
+
+  useEffect(() => {
+    if (!isResizingRight) return;
+    const handleMove = (e: MouseEvent) => {
+      const delta = resizeStartX.current - e.clientX;
+      const next = Math.min(
+        FILE_EXPLORER_MAX_WIDTH,
+        Math.max(FILE_EXPLORER_MIN_WIDTH, resizeStartWidth.current + delta)
+      );
+      setRightPanelWidth(next);
+    };
+    const handleUp = () => setIsResizingRight(false);
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('mouseup', handleUp);
+    return () => {
+      document.removeEventListener('mousemove', handleMove);
+      document.removeEventListener('mouseup', handleUp);
+    };
+  }, [isResizingRight]);
+
   return (
     <div
       style={{
@@ -119,6 +153,29 @@ function App() {
         onCloseOtherTabs={(keepTabId) => dispatch({ type: 'CLOSE_OTHER_TABS', keepTabId })}
         onReorderTabs={(from, to) => dispatch({ type: 'REORDER_TABS', fromIndex: from, toIndex: to })}
         onOpenChat={() => openApp('chat')}
+      />
+      {!state.rightSidebarCollapsed && (
+        <div
+          role="separator"
+          onMouseDown={handleRightResizeStart}
+          style={{
+            width: 6,
+            minWidth: 6,
+            flexShrink: 0,
+            background: isResizingRight ? 'var(--accent-shell)' : 'transparent',
+            cursor: 'col-resize',
+            borderLeft: '1px solid var(--border-subtle)',
+            borderRight: '1px solid var(--border-subtle)',
+          }}
+          title="Drag to resize"
+        />
+      )}
+      <FileExplorerPanel
+        collapsed={state.rightSidebarCollapsed}
+        width={rightPanelWidth}
+        isResizing={isResizingRight}
+        onToggleSidebar={() => dispatch({ type: 'TOGGLE_RIGHT_SIDEBAR' })}
+        onOpenApp={openApp}
       />
     </div>
   );

@@ -36,6 +36,7 @@ export interface AppState {
   openTabs: Tab[];
   activeTabId: string | null;
   sidebarCollapsed: boolean;
+  rightSidebarCollapsed: boolean;
   launchedApps: LaunchedApp[];
 }
 
@@ -49,7 +50,8 @@ export type AppAction =
   | { type: 'CLOSE_OTHER_TABS'; keepTabId: string }
   | { type: 'SET_ACTIVE_TAB'; tabId: string | null }
   | { type: 'REORDER_TABS'; fromIndex: number; toIndex: number }
-  | { type: 'TOGGLE_SIDEBAR' };
+  | { type: 'TOGGLE_SIDEBAR' }
+  | { type: 'TOGGLE_RIGHT_SIDEBAR' };
 
 const tabTypeTitles: Record<Exclude<TabType, 'launched'>, string> = {
   chat: 'Chat',
@@ -187,6 +189,8 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     }
     case 'TOGGLE_SIDEBAR':
       return { ...state, sidebarCollapsed: !state.sidebarCollapsed };
+    case 'TOGGLE_RIGHT_SIDEBAR':
+      return { ...state, rightSidebarCollapsed: !state.rightSidebarCollapsed };
     default:
       return state;
   }
@@ -196,6 +200,7 @@ export const initialState: AppState = {
   openTabs: [],
   activeTabId: null,
   sidebarCollapsed: false,
+  rightSidebarCollapsed: false,
   launchedApps: [],
 };
 

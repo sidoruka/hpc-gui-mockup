@@ -4,9 +4,6 @@ import {
   MessageCircle,
   Terminal,
   Monitor,
-  Folder,
-  Share2,
-  Database,
   User,
   PanelLeftClose,
   PanelLeftOpen,
@@ -45,12 +42,6 @@ const appsGroup: NavItem[] = [
   { type: 'jupyter', icon: JupyterIcon, color: 'var(--accent-jupyter)' },
   { type: 'rstudio', icon: RStudioIcon, color: 'var(--accent-rstudio)' },
   { type: 'vscode', icon: VSCodeIcon, color: 'var(--accent-vscode)' },
-];
-
-const dataGroup: NavItem[] = [
-  { type: 'my-files', icon: Folder, color: 'var(--accent-files)' },
-  { type: 'shared-with-me', icon: Share2, color: 'var(--accent-shared)' },
-  { type: 'common-data', icon: Database, color: 'var(--accent-common)' },
 ];
 
 interface LeftPanelProps {
@@ -112,7 +103,6 @@ export function LeftPanel({
   const [sectionsExpanded, setSectionsExpanded] = useState({
     apps: true,
     pipelines: true,
-    data: true,
   });
   const [hoveredNavKey, setHoveredNavKey] = useState<string | null>(null);
 
@@ -363,7 +353,7 @@ export function LeftPanel({
             </div>
             {sectionsExpanded.apps && (
               <>
-            {appsGroup.map(({ type, icon: Icon, color }) => (
+            {appsGroup.map(({ type, icon: Icon }) => (
               <button
                 key={type}
                 type="button"
@@ -661,62 +651,6 @@ export function LeftPanel({
             ))}
             </>
             )}
-            <button
-              type="button"
-              onClick={() => toggleSection('data')}
-              style={{
-                width: '100%',
-                padding: '6px 12px 2px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--text-primary)',
-                cursor: 'pointer',
-                textAlign: 'left',
-              }}
-            >
-              <span style={{ flex: 1, fontWeight: 600, fontSize: '13px', minWidth: 0, textAlign: 'left' }}>Data</span>
-              {sectionsExpanded.data ? (
-                <ChevronDown size={12} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
-              ) : (
-                <ChevronRight size={12} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
-              )}
-            </button>
-            {sectionsExpanded.data && (
-            <>
-            {dataGroup.map(({ type, icon: Icon, color }) => (
-              <button
-                key={type}
-                type="button"
-                onClick={() => onOpenApp(type)}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '4px 12px',
-                  margin: '0 8px',
-                  borderRadius: '6px',
-                  background: 'transparent',
-                  border: 'none',
-                  color: 'var(--text-primary)',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  textAlign: 'left',
-                }}
-                {...getNavItemHover(type)}
-              >
-                <LeftPaneNavIcon
-                  icon={Icon}
-                  iconColor={hoveredNavKey === type ? 'var(--accent-pipelines)' : 'var(--text-secondary)'}
-                />
-                {getTitleForType(type)}
-              </button>
-            ))}
-            </>
-            )}
           </nav>
           <div
             style={{
@@ -809,7 +743,7 @@ export function LeftPanel({
             >
               <Plus size={15} />
             </button>
-            {appsGroup.map(({ type, icon: Icon, color }) => (
+            {appsGroup.map(({ type, icon: Icon }) => (
               <button
                 key={type}
                 type="button"
@@ -898,32 +832,6 @@ export function LeftPanel({
                 })}
               </>
             )}
-            {dataGroup.map(({ type, icon: Icon, color }) => (
-              <button
-                key={type}
-                type="button"
-                onClick={() => onOpenApp(type)}
-                title={getTitleForType(type)}
-                style={{
-                  width: 40,
-                  height: 40,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: 'transparent',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  flexShrink: 0,
-                }}
-                {...getNavItemHover(type)}
-              >
-                <LeftPaneNavIcon
-                  icon={Icon}
-                  iconColor={hoveredNavKey === type ? 'var(--accent-pipelines)' : 'var(--text-secondary)'}
-                />
-              </button>
-            ))}
           </nav>
           <div
             style={{
