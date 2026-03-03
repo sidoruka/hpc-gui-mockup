@@ -21,14 +21,16 @@ const MIN_SIDEBAR_WIDTH = 180;
 const MAX_SIDEBAR_WIDTH = 480;
 const DEFAULT_SIDEBAR_WIDTH = 240;
 
-export type Theme = 'dark' | 'light';
+export type Theme = 'dark' | 'light' | 'christmas';
 
 const THEME_STORAGE_KEY = 'hpc-mockups-theme';
+
+const VALID_THEMES: Theme[] = ['dark', 'light', 'christmas'];
 
 function getInitialTheme(): Theme {
   try {
     const stored = localStorage.getItem(THEME_STORAGE_KEY);
-    if (stored === 'light' || stored === 'dark') return stored;
+    if (VALID_THEMES.includes(stored as Theme)) return stored as Theme;
   } catch {
     /* ignore */
   }

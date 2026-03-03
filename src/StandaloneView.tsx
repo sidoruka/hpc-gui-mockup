@@ -48,7 +48,7 @@ export function StandaloneView() {
   useEffect(() => {
     try {
       const t = localStorage.getItem(THEME_STORAGE_KEY);
-      document.documentElement.setAttribute('data-theme', (t === 'light' || t === 'dark') ? t : 'dark');
+      document.documentElement.setAttribute('data-theme', (t === 'light' || t === 'dark' || t === 'christmas') ? t : 'dark');
     } catch {
       document.documentElement.setAttribute('data-theme', 'dark');
     }

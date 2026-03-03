@@ -17,6 +17,9 @@ import {
   Info,
   Star,
   Check,
+  Gift,
+  Snowflake,
+  TreePine,
 } from 'lucide-react';
 import type { TabType, LaunchedApp } from '../state/appState';
 import { getTitleForType } from '../state/appState';
@@ -34,17 +37,21 @@ interface NavItem {
   type: TabType;
   icon: React.ElementType;
   color: string;
+  /** Optional icon when Christmas theme is active */
+  iconChristmas?: React.ElementType;
 }
 
-const chatItem: NavItem = { type: 'chat', icon: MessageCircle, color: 'var(--accent-chat)' };
+const chatItem: NavItem = { type: 'chat', icon: MessageCircle, iconChristmas: Gift, color: 'var(--accent-chat)' };
 
 const appsGroup: NavItem[] = [
-  { type: 'shell', icon: Terminal, color: 'var(--accent-shell)' },
-  { type: 'desktop', icon: Monitor, color: 'var(--accent-desktop)' },
+  { type: 'shell', icon: Terminal, iconChristmas: Snowflake, color: 'var(--accent-shell)' },
+  { type: 'desktop', icon: Monitor, iconChristmas: TreePine, color: 'var(--accent-desktop)' },
   { type: 'jupyter', icon: JupyterIcon, color: 'var(--accent-jupyter)' },
   { type: 'rstudio', icon: RStudioIcon, color: 'var(--accent-rstudio)' },
   { type: 'vscode', icon: VSCodeIcon, color: 'var(--accent-vscode)' },
 ];
+
+const THEME_LABELS: Record<Theme, string> = { dark: 'Dark', light: 'Light', christmas: 'Christmas' };
 
 interface LeftPanelProps {
   collapsed: boolean;
@@ -261,7 +268,7 @@ export function LeftPanel({
               {...getNavItemHover('chat')}
             >
               <LeftPaneNavIcon
-                icon={MessageCircle}
+                icon={theme === 'christmas' && chatItem.iconChristmas ? chatItem.iconChristmas : chatItem.icon}
                 iconColor={hoveredNavKey === 'chat' ? 'var(--accent-pipelines)' : 'var(--text-secondary)'}
                 iconSize={15}
               />
@@ -346,7 +353,10 @@ export function LeftPanel({
             </div>
             {sectionsExpanded.apps && (
               <>
-            {appsGroup.map(({ type, icon: Icon }) => (
+            {appsGroup.map((item) => {
+              const Icon = (theme === 'christmas' && item.iconChristmas ? item.iconChristmas : item.icon) as React.ElementType;
+              const { type } = item;
+              return (
               <button
                 key={type}
                 type="button"
@@ -371,7 +381,8 @@ export function LeftPanel({
                 </LeftPaneNavIcon>
                 {getTitleForType(type)}
               </button>
-            ))}
+            );
+            })}
             {launchedApps.length > 0 && (
               <>
                 <div
@@ -744,7 +755,7 @@ export function LeftPanel({
                         <ChevronRight size={14} style={{ transform: 'rotate(180deg)' }} />
                         Appearance
                       </button>
-                      {(['dark', 'light'] as const).map((t) => (
+                      {(['dark', 'light', 'christmas'] as Theme[]).map((t) => (
                         <button
                           key={t}
                           type="button"
@@ -774,7 +785,7 @@ export function LeftPanel({
                           }}
                         >
                           {theme === t ? <Check size={14} style={{ flexShrink: 0 }} /> : <span style={{ width: 14, flexShrink: 0 }} />}
-                          {t === 'dark' ? 'Dark' : 'Light'}
+                          {THEME_LABELS[t]}
                         </button>
                       ))}
                     </>
@@ -1172,7 +1183,7 @@ export function LeftPanel({
                         <ChevronRight size={14} style={{ transform: 'rotate(180deg)' }} />
                         Appearance
                       </button>
-                      {(['dark', 'light'] as const).map((t) => (
+                      {(['dark', 'light', 'christmas'] as Theme[]).map((t) => (
                         <button
                           key={t}
                           type="button"
@@ -1202,7 +1213,7 @@ export function LeftPanel({
                           }}
                         >
                           {theme === t ? <Check size={14} style={{ flexShrink: 0 }} /> : <span style={{ width: 14, flexShrink: 0 }} />}
-                          {t === 'dark' ? 'Dark' : 'Light'}
+                          {THEME_LABELS[t]}
                         </button>
                       ))}
                     </>

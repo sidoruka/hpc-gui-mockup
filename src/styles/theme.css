@@ -51,6 +51,33 @@
   --run-status-running: #0284c7;
 }
 
+/* Christmas appearance: festive red & green, semi-transparent panels so snowfall shows through */
+[data-theme="christmas"] {
+  --bg-main: rgba(26, 13, 13, 0.72);
+  --bg-sidebar: rgba(45, 21, 21, 0.78);
+  --bg-search: rgba(61, 26, 26, 0.75);
+  --bg-hover: rgba(74, 32, 32, 0.85);
+  --bg-active: rgba(92, 40, 40, 0.9);
+  --text-primary: #f5f0e6;
+  --text-secondary: #e8c4c4;
+  --border-subtle: rgba(74, 32, 32, 0.7);
+  --accent-shell: #c41e3a;
+  --accent-desktop: #228b22;
+  --accent-jupyter: #c41e3a;
+  --accent-rstudio: #228b22;
+  --accent-vscode: #daa520;
+  --accent-files: #228b22;
+  --accent-shared: #c41e3a;
+  --accent-common: #daa520;
+  --accent-chat: #c41e3a;
+  --accent-launch: #228b22;
+  --accent-pipelines: #daa520;
+  --run-status-success: #228b22;
+  --run-status-stopped: #daa520;
+  --run-status-failure: #c41e3a;
+  --run-status-running: #228b22;
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -67,4 +94,78 @@ html, body, #root {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
   background: var(--bg-main);
   color: var(--text-primary);
+}
+
+/* Christmas theme: red & green gradient background + snowfall animation */
+[data-theme="christmas"] body {
+  background: var(--bg-main);
+  background-image:
+    radial-gradient(ellipse 100% 60% at 70% 0%, rgba(196, 30, 58, 0.25), transparent 50%),
+    radial-gradient(ellipse 80% 50% at 20% 100%, rgba(34, 139, 34, 0.2), transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(218, 165, 32, 0.06), transparent 40%);
+  position: relative;
+  overflow-x: hidden;
+}
+
+[data-theme="christmas"] #root {
+  background: transparent;
+  position: relative;
+  z-index: 1;
+}
+
+/* Snowfall layers - two speeds for depth, behind content */
+@keyframes snowfall {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+[data-theme="christmas"] body::before,
+[data-theme="christmas"] body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 200vh;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.95;
+}
+
+[data-theme="christmas"] body::before {
+  background-image:
+    radial-gradient(circle at 10% 0%, white 1.5px, transparent 1.5px),
+    radial-gradient(circle at 30% 5%, white 1px, transparent 1px),
+    radial-gradient(circle at 50% 2%, white 2px, transparent 2px),
+    radial-gradient(circle at 70% 8%, white 1px, transparent 1px),
+    radial-gradient(circle at 90% 3%, white 1.5px, transparent 1.5px),
+    radial-gradient(circle at 15% 15%, white 1px, transparent 1px),
+    radial-gradient(circle at 45% 12%, white 1.5px, transparent 1.5px),
+    radial-gradient(circle at 75% 18%, white 1px, transparent 1px),
+    radial-gradient(circle at 5% 25%, white 1px, transparent 1px),
+    radial-gradient(circle at 55% 22%, white 1.5px, transparent 1.5px),
+    radial-gradient(circle at 85% 28%, white 1px, transparent 1px),
+    radial-gradient(circle at 25% 35%, white 1.5px, transparent 1.5px),
+    radial-gradient(circle at 65% 32%, white 1px, transparent 1px),
+    radial-gradient(circle at 95% 38%, white 1px, transparent 1px);
+  background-size: 200px 120px;
+  background-repeat: repeat;
+  animation: snowfall 18s linear infinite;
+}
+
+[data-theme="christmas"] body::after {
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,0.9) 1px, transparent 1px),
+    radial-gradient(circle at 60% 10%, rgba(255,255,255,0.9) 1.5px, transparent 1.5px),
+    radial-gradient(circle at 80% 5%, rgba(255,255,255,0.9) 1px, transparent 1px),
+    radial-gradient(circle at 40% 20%, rgba(255,255,255,0.9) 1px, transparent 1px),
+    radial-gradient(circle at 10% 25%, rgba(255,255,255,0.9) 1.5px, transparent 1.5px),
+    radial-gradient(circle at 90% 15%, rgba(255,255,255,0.9) 1px, transparent 1px),
+    radial-gradient(circle at 50% 30%, rgba(255,255,255,0.9) 1px, transparent 1px),
+    radial-gradient(circle at 70% 35%, rgba(255,255,255,0.9) 1.5px, transparent 1.5px),
+    radial-gradient(circle at 30% 40%, rgba(255,255,255,0.9) 1px, transparent 1px);
+  background-size: 250px 150px;
+  background-repeat: repeat;
+  animation: snowfall 24s linear infinite;
+  animation-delay: -8s;
 }
