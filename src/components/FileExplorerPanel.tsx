@@ -344,7 +344,8 @@ export function FileExplorerPanel({
           borderTop: '1px solid var(--border-subtle)',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'flex-start',
+          justifyContent: 'space-between',
+          gap: '8px',
         }}
       >
         <button
@@ -361,6 +362,18 @@ export function FileExplorerPanel({
         >
           <PanelRightClose size={14} />
         </button>
+        <span
+          style={{
+            fontSize: '11px',
+            color: 'var(--text-secondary)',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+          title="180 Gb out of 500 Gb available"
+        >
+          180 Gb out of 500 Gb available
+        </span>
       </div>
     </aside>
   );
