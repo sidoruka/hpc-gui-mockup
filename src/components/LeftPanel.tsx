@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Search,
   MessageCircle,
@@ -17,6 +17,9 @@ import {
   List,
   ChevronDown,
   ChevronRight,
+  MoreVertical,
+  Info,
+  Star,
 } from 'lucide-react';
 import type { TabType, LaunchedApp } from '../state/appState';
 import { getTitleForType } from '../state/appState';
@@ -88,10 +91,24 @@ export function LeftPanel({
 }: LeftPanelProps) {
   const [launchDialogOpen, setLaunchDialogOpen] = useState(false);
   const [stopConfirmApp, setStopConfirmApp] = useState<LaunchedApp | null>(null);
+  const [openMenuAppId, setOpenMenuAppId] = useState<string | null>(null);
+  const menuContainerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (openMenuAppId === null) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuContainerRef.current && !menuContainerRef.current.contains(e.target as Node)) {
+        setOpenMenuAppId(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [openMenuAppId]);
+
   const [sectionsExpanded, setSectionsExpanded] = useState({
-    apps: false,
-    pipelines: false,
-    data: false,
+    apps: true,
+    pipelines: true,
+    data: true,
   });
 
   const toggleSection = (key: keyof typeof sectionsExpanded) =>
@@ -424,33 +441,140 @@ export function LeftPanel({
                         </span>
                       </button>
                       {!isLaunching && (
-                        <button
-                          type="button"
-                          onClick={() => setStopConfirmApp(app)}
-                          title="Stop app"
-                          style={{
-                            flexShrink: 0,
-                            padding: '6px',
-                            background: 'transparent',
-                            border: 'none',
-                            color: 'var(--text-secondary)',
-                            cursor: 'pointer',
-                            borderRadius: '4px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background = 'var(--bg-hover)';
-                            e.currentTarget.style.color = 'var(--text-primary)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background = 'transparent';
-                            e.currentTarget.style.color = 'var(--text-secondary)';
-                          }}
+                        <div
+                          ref={openMenuAppId === app.id ? menuContainerRef : undefined}
+                          style={{ position: 'relative', flexShrink: 0 }}
                         >
-                          <Square size={11} fill="currentColor" />
-                        </button>
+                          <button
+                            type="button"
+                            onClick={() => setOpenMenuAppId((id) => (id === app.id ? null : app.id))}
+                            title="Actions"
+                            style={{
+                              padding: '6px',
+                              background: openMenuAppId === app.id ? 'var(--bg-hover)' : 'transparent',
+                              border: 'none',
+                              color: openMenuAppId === app.id ? 'var(--text-primary)' : 'var(--text-secondary)',
+                              cursor: 'pointer',
+                              borderRadius: '4px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                            onMouseEnter={(e) => {
+                              if (openMenuAppId !== app.id) {
+                                e.currentTarget.style.background = 'var(--bg-hover)';
+                                e.currentTarget.style.color = 'var(--text-primary)';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (openMenuAppId !== app.id) {
+                                e.currentTarget.style.background = 'transparent';
+                                e.currentTarget.style.color = 'var(--text-secondary)';
+                              }
+                            }}
+                          >
+                            <MoreVertical size={14} />
+                          </button>
+                          {openMenuAppId === app.id && (
+                            <div
+                              style={{
+                                position: 'absolute',
+                                right: 0,
+                                top: '100%',
+                                marginTop: '2px',
+                                minWidth: '140px',
+                                background: 'var(--bg-sidebar)',
+                                border: '1px solid var(--border-subtle)',
+                                borderRadius: '6px',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                                padding: '4px 0',
+                                zIndex: 100,
+                              }}
+                            >
+                              <button
+                                type="button"
+                                onClick={() => setOpenMenuAppId(null)}
+                                style={{
+                                  width: '100%',
+                                  padding: '8px 12px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '8px',
+                                  background: 'transparent',
+                                  border: 'none',
+                                  color: 'var(--text-primary)',
+                                  cursor: 'pointer',
+                                  fontSize: '13px',
+                                  textAlign: 'left',
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.background = 'var(--bg-hover)';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.background = 'transparent';
+                                }}
+                              >
+                                <Info size={12} />
+                                View details
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setOpenMenuAppId(null)}
+                                style={{
+                                  width: '100%',
+                                  padding: '8px 12px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '8px',
+                                  background: 'transparent',
+                                  border: 'none',
+                                  color: 'var(--text-primary)',
+                                  cursor: 'pointer',
+                                  fontSize: '13px',
+                                  textAlign: 'left',
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.background = 'var(--bg-hover)';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.background = 'transparent';
+                                }}
+                              >
+                                <Star size={12} />
+                                Add to favorite
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setStopConfirmApp(app);
+                                  setOpenMenuAppId(null);
+                                }}
+                                style={{
+                                  width: '100%',
+                                  padding: '8px 12px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '8px',
+                                  background: 'transparent',
+                                  border: 'none',
+                                  color: 'var(--text-primary)',
+                                  cursor: 'pointer',
+                                  fontSize: '13px',
+                                  textAlign: 'left',
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.background = 'var(--bg-hover)';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.background = 'transparent';
+                                }}
+                              >
+                                <Square size={11} fill="currentColor" />
+                                Stop
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       )}
                     </div>
                   );
