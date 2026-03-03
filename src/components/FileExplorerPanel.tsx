@@ -584,10 +584,58 @@ export function FileExplorerPanel({
       </div>
       {contextMenu && (
         <div
-          style={{ position: 'fixed', left: contextMenu.x, top: contextMenu.y, zIndex: 10000, display: 'flex' }}
+          style={{
+            position: 'fixed',
+            left: createSubmenuOpen && !contextMenu.isFile ? contextMenu.x - 122 : contextMenu.x,
+            top: contextMenu.y,
+            zIndex: 10000,
+            display: 'flex',
+            flexDirection: 'row',
+          }}
           onClick={(e) => e.stopPropagation()}
           onMouseLeave={() => setCreateSubmenuOpen(false)}
         >
+          {createSubmenuOpen && !contextMenu.isFile && (
+            <div
+              role="menu"
+              style={{
+                minWidth: 120,
+                padding: 0,
+                marginRight: 2,
+                alignSelf: 'flex-start',
+                background: 'var(--bg-dropdown, #2d2d2d)',
+                border: '1px solid var(--border-subtle, #444)',
+                borderRadius: '6px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                fontSize: '13px',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <button
+                type="button"
+                role="menuitem"
+                onClick={createFolder}
+                style={submenuItemStyle}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-hover)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+              >
+                <Folder size={14} style={{ flexShrink: 0 }} />
+                Folder
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                onClick={createFile}
+                style={submenuItemStyle}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-hover)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+              >
+                <File size={14} style={{ flexShrink: 0 }} />
+                File
+              </button>
+            </div>
+          )}
           <div
             role="menu"
             style={{
@@ -689,47 +737,6 @@ export function FileExplorerPanel({
             Delete
           </button>
           </div>
-          {createSubmenuOpen && !contextMenu.isFile && (
-            <div
-              role="menu"
-              style={{
-                minWidth: 120,
-                padding: 0,
-                marginLeft: 2,
-                alignSelf: 'flex-start',
-                background: 'var(--bg-dropdown, #2d2d2d)',
-                border: '1px solid var(--border-subtle, #444)',
-                borderRadius: '6px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-                fontSize: '13px',
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              <button
-                type="button"
-                role="menuitem"
-                onClick={createFolder}
-                style={submenuItemStyle}
-                onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-hover)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-              >
-                <Folder size={14} style={{ flexShrink: 0 }} />
-                Folder
-              </button>
-              <button
-                type="button"
-                role="menuitem"
-                onClick={createFile}
-                style={submenuItemStyle}
-                onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-hover)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-              >
-                <File size={14} style={{ flexShrink: 0 }} />
-                File
-              </button>
-            </div>
-          )}
         </div>
       )}
       <div
