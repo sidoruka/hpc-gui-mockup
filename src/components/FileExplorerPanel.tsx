@@ -97,6 +97,8 @@ type ContextMenuState = {
   sectionId: DataSectionId;
   nodeName: string;
   isFile: boolean;
+  /** True when opened from "My files" / "Shared with me" / "Common data" header; only Create submenu is shown */
+  isSectionHeader?: boolean;
 } | null;
 
 /** Path within section e.g. "documents/report.pdf" -> ["documents", "report.pdf"] */
@@ -340,7 +342,7 @@ export function FileExplorerPanel({
   }, [contextMenu, closeContextMenu]);
 
   const handleContextMenu = useCallback(
-    (e: React.MouseEvent, payload: { fullPath: string; sectionId: DataSectionId; nodeName: string; isFile: boolean }) => {
+    (e: React.MouseEvent, payload: { fullPath: string; sectionId: DataSectionId; nodeName: string; isFile: boolean; isSectionHeader?: boolean }) => {
       setContextMenu({
         x: e.clientX,
         y: e.clientY,
@@ -348,6 +350,7 @@ export function FileExplorerPanel({
         sectionId: payload.sectionId,
         nodeName: payload.nodeName,
         isFile: payload.isFile,
+        isSectionHeader: payload.isSectionHeader,
       });
       setCreateSubmenuOpen(false);
     },
@@ -429,15 +432,18 @@ export function FileExplorerPanel({
       setCreateSubmenuOpen(false);
       return;
     }
-    const pathParts = pathPartsWithinSection(contextMenu.fullPath, contextMenu.sectionId);
-    const parentDepth = Math.max(0, pathParts.length - 1);
-    const parentName = pathParts[pathParts.length - 1] ?? contextMenu.nodeName;
-    const expandKey = `${parentDepth}-${parentName}`;
+    const pathParts = contextMenu.isSectionHeader ? [] : pathPartsWithinSection(contextMenu.fullPath, contextMenu.sectionId);
     setTreeData((prev) => ({
       ...prev,
       [contextMenu.sectionId]: addChildToTree(prev[contextMenu.sectionId], pathParts, { name: name.trim(), children: [] }),
     }));
-    setTreeExpanded((prev) => ({ ...prev, [expandKey]: true }));
+    if (contextMenu.isSectionHeader) {
+      setSectionsExpanded((prev) => ({ ...prev, [contextMenu.sectionId]: true }));
+    } else {
+      const parentDepth = Math.max(0, pathParts.length - 1);
+      const parentName = pathParts[pathParts.length - 1] ?? contextMenu.nodeName;
+      setTreeExpanded((prev) => ({ ...prev, [`${parentDepth}-${parentName}`]: true }));
+    }
     closeContextMenu();
   }, [contextMenu, closeContextMenu]);
 
@@ -448,15 +454,18 @@ export function FileExplorerPanel({
       setCreateSubmenuOpen(false);
       return;
     }
-    const pathParts = pathPartsWithinSection(contextMenu.fullPath, contextMenu.sectionId);
-    const parentDepth = Math.max(0, pathParts.length - 1);
-    const parentName = pathParts[pathParts.length - 1] ?? contextMenu.nodeName;
-    const expandKey = `${parentDepth}-${parentName}`;
+    const pathParts = contextMenu.isSectionHeader ? [] : pathPartsWithinSection(contextMenu.fullPath, contextMenu.sectionId);
     setTreeData((prev) => ({
       ...prev,
       [contextMenu.sectionId]: addChildToTree(prev[contextMenu.sectionId], pathParts, { name: name.trim(), isFile: true }),
     }));
-    setTreeExpanded((prev) => ({ ...prev, [expandKey]: true }));
+    if (contextMenu.isSectionHeader) {
+      setSectionsExpanded((prev) => ({ ...prev, [contextMenu.sectionId]: true }));
+    } else {
+      const parentDepth = Math.max(0, pathParts.length - 1);
+      const parentName = pathParts[pathParts.length - 1] ?? contextMenu.nodeName;
+      setTreeExpanded((prev) => ({ ...prev, [`${parentDepth}-${parentName}`]: true }));
+    }
     closeContextMenu();
   }, [contextMenu, closeContextMenu]);
 
@@ -533,6 +542,11 @@ export function FileExplorerPanel({
               <button
                 type="button"
                 onClick={() => toggleSection(id)}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleContextMenu(e, { fullPath: id, sectionId: id, nodeName: label, isFile: false, isSectionHeader: true });
+                }}
                 style={{
                   width: '100%',
                   display: 'flex',
@@ -639,7 +653,7 @@ export function FileExplorerPanel({
           <div
             role="menu"
             style={{
-              minWidth: 180,
+              minWidth: contextMenu.isSectionHeader ? 120 : 180,
               padding: '4px 0',
               background: 'var(--bg-dropdown, #2d2d2d)',
               border: '1px solid var(--border-subtle, #444)',
@@ -648,38 +662,42 @@ export function FileExplorerPanel({
               fontSize: '13px',
             }}
           >
-            {!contextMenu.isFile && (
-              <>
-                <button
-                  type="button"
-                  role="menuitem"
-                  onClick={uploadFiles}
-                  style={menuItemStyle}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-hover)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                >
-                  <Upload size={14} style={{ flexShrink: 0 }} />
-                  Upload file(s)
-                </button>
-                <button
-                  type="button"
-                  role="menuitem"
-                  style={{ ...menuItemStyle, justifyContent: 'space-between' }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'var(--bg-hover)';
-                    setCreateSubmenuOpen(true);
-                  }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                >
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Folder size={14} style={{ flexShrink: 0 }} />
-                    Create
-                  </span>
-                  <ChevronRight size={14} style={{ flexShrink: 0 }} />
-                </button>
-                <div style={{ height: 1, background: 'var(--border-subtle, #444)', margin: '4px 8px' }} />
-              </>
+            {!contextMenu.isSectionHeader && !contextMenu.isFile && (
+              <button
+                type="button"
+                role="menuitem"
+                onClick={uploadFiles}
+                style={menuItemStyle}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-hover)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+              >
+                <Upload size={14} style={{ flexShrink: 0 }} />
+                Upload file(s)
+              </button>
             )}
+            {(!contextMenu.isFile || contextMenu.isSectionHeader) && (
+              <button
+                type="button"
+                role="menuitem"
+                style={{ ...menuItemStyle, justifyContent: contextMenu.isSectionHeader ? 'space-between' : undefined }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--bg-hover)';
+                  setCreateSubmenuOpen(true);
+                }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+              >
+                <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Folder size={14} style={{ flexShrink: 0 }} />
+                  Create
+                </span>
+                <ChevronRight size={14} style={{ flexShrink: 0 }} />
+              </button>
+            )}
+            {!contextMenu.isSectionHeader && !contextMenu.isFile && (
+              <div style={{ height: 1, background: 'var(--border-subtle, #444)', margin: '4px 8px' }} />
+            )}
+            {!contextMenu.isSectionHeader && (
+              <>
           <button
             type="button"
             role="menuitem"
@@ -736,6 +754,8 @@ export function FileExplorerPanel({
             <Trash2 size={14} style={{ flexShrink: 0 }} />
             Delete
           </button>
+              </>
+            )}
           </div>
         </div>
       )}
