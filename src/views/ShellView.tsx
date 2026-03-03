@@ -13,21 +13,32 @@ function pathFromDrag(sectionId: DataSectionId, relativePath: string): string {
   return prefix + relativePath;
 }
 
-function PromptLine({ input, showCursor = false }: { input: string; showCursor?: boolean }) {
+function PromptLine({
+  input,
+  cursorAt,
+  showCursor = false,
+}: {
+  input: string;
+  cursorAt?: number;
+  showCursor?: boolean;
+}) {
+  const pos = showCursor ? Math.min(cursorAt ?? input.length, input.length) : input.length;
   return (
     <div style={{ marginBottom: '8px' }}>
       <span style={{ color: '#4ec9b0' }}>user@login</span>
       <span style={{ color: '#808080' }}>:</span>
       <span style={{ color: '#ce9178' }}>~</span>
       <span style={{ color: '#d4d4d4' }}> $ </span>
-      <span style={{ color: '#dcdcaa' }}>{input}</span>
+      <span style={{ color: '#dcdcaa' }}>{input.slice(0, pos)}</span>
       {showCursor && <span style={{ color: '#6a9955' }}>█</span>}
+      <span style={{ color: '#dcdcaa' }}>{input.slice(pos)}</span>
     </div>
   );
 }
 
 export function ShellView() {
   const [commandLine, setCommandLine] = useState('');
+  const [cursor, setCursor] = useState(0);
   const [history, setHistory] = useState<Array<{ input: string; interrupted?: boolean }>>([]);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -51,19 +62,78 @@ export function ShellView() {
     try {
       const { sectionId, relativePath } = JSON.parse(raw) as { sectionId: DataSectionId; relativePath: string };
       const path = pathFromDrag(sectionId, relativePath);
-      setCommandLine((prev) => (prev ? `${prev} ${path}` : path));
+      const insert = commandLine ? ` ${path}` : path;
+      setCommandLine((prev) => prev.slice(0, cursor) + insert + prev.slice(cursor));
+      setCursor((prev) => prev + insert.length);
     } catch {
       // ignore invalid drag data
     }
-  }, []);
+  }, [commandLine, cursor]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
       e.preventDefault();
       setHistory((prev) => [...prev, { input: commandLine, interrupted: true }]);
       setCommandLine('');
+      setCursor(0);
+      return;
     }
-  }, [commandLine]);
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (commandLine.trim() === 'clear') {
+        setHistory([]);
+        setCommandLine('');
+        setCursor(0);
+      } else {
+        setHistory((prev) => [...prev, { input: commandLine }]);
+        setCommandLine('');
+        setCursor(0);
+      }
+      return;
+    }
+    if (e.ctrlKey || e.metaKey) return;
+
+    if (e.key === 'Backspace') {
+      e.preventDefault();
+      if (cursor > 0) {
+        setCommandLine((prev) => prev.slice(0, cursor - 1) + prev.slice(cursor));
+        setCursor((prev) => prev - 1);
+      }
+      return;
+    }
+    if (e.key === 'Delete') {
+      e.preventDefault();
+      if (cursor < commandLine.length) {
+        setCommandLine((prev) => prev.slice(0, cursor) + prev.slice(cursor + 1));
+      }
+      return;
+    }
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      setCursor((prev) => Math.max(0, prev - 1));
+      return;
+    }
+    if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      setCursor((prev) => Math.min(commandLine.length, prev + 1));
+      return;
+    }
+    if (e.key === 'Home') {
+      e.preventDefault();
+      setCursor(0);
+      return;
+    }
+    if (e.key === 'End') {
+      e.preventDefault();
+      setCursor(commandLine.length);
+      return;
+    }
+    if (e.key.length === 1 && !e.altKey) {
+      e.preventDefault();
+      setCommandLine((prev) => prev.slice(0, cursor) + e.key + prev.slice(cursor));
+      setCursor((prev) => prev + 1);
+    }
+  }, [commandLine, cursor]);
 
   return (
     <div
@@ -86,30 +156,7 @@ export function ShellView() {
       onKeyDown={handleKeyDown}
     >
       <div style={{ marginBottom: '8px' }}>
-        <span style={{ color: '#4ec9b0' }}>user@login</span>
-        <span style={{ color: '#808080' }}>:</span>
-        <span style={{ color: '#ce9178' }}>~</span>
-        <span style={{ color: '#d4d4d4' }}> $ </span>
-      </div>
-      <div style={{ marginBottom: '8px' }}>
         <span style={{ color: '#569cd6' }}>Welcome to HPC login node.</span>
-      </div>
-      <div style={{ marginBottom: '8px' }}>
-        <span style={{ color: '#4ec9b0' }}>user@login</span>
-        <span style={{ color: '#808080' }}>:</span>
-        <span style={{ color: '#ce9178' }}>~</span>
-        <span style={{ color: '#d4d4d4' }}> $ </span>
-        <span style={{ color: '#dcdcaa' }}>ls -la</span>
-      </div>
-      <div style={{ marginBottom: '8px', color: '#808080' }}>
-        total 24<br />
-        drwxr-xr-x 4 user group 4096 Feb 27 10:00 .
-        <br />
-        drwxr-xr-x 6 user group 4096 Feb 20 09:00 ..
-        <br />
-        drwxr-xr-x 2 user group 4096 Feb 27 09:00 projects
-        <br />
-        -rw-r--r-- 1 user group 1024 Feb 26 14:00 data.csv
       </div>
       {history.map((entry, i) => (
         <div key={i}>
@@ -119,7 +166,7 @@ export function ShellView() {
           )}
         </div>
       ))}
-      <PromptLine input={commandLine} showCursor />
+      <PromptLine input={commandLine} cursorAt={cursor} showCursor />
     </div>
   );
 }
