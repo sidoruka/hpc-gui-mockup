@@ -71,7 +71,7 @@ const navButtonStyle = {
   display: 'flex' as const,
   alignItems: 'center' as const,
   gap: '12px',
-  padding: '6px 12px',
+  padding: '4px 12px',
   margin: '0 8px' as const,
   borderRadius: '6px',
   background: 'transparent',
@@ -255,7 +255,7 @@ export function LeftPanel({
               }}
             />
           </div>
-          <nav style={{ flex: 1, overflow: 'auto', padding: '4px 0' }}>
+          <nav style={{ flex: 1, overflow: 'auto', padding: '2px 0' }}>
             <button
               type="button"
               onClick={() => onOpenApp(chatItem.type)}
@@ -264,7 +264,7 @@ export function LeftPanel({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px',
-                padding: '6px 12px',
+                padding: '4px 12px',
                 margin: '0 8px',
                 borderRadius: '6px',
                 background: 'transparent',
@@ -285,7 +285,7 @@ export function LeftPanel({
             </button>
             <div
               style={{
-                padding: '4px 12px',
+                padding: '2px 12px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
@@ -391,11 +391,11 @@ export function LeftPanel({
             {launchedApps.length > 0 && (
               <>
                 <div
-                  style={{
-                    margin: '4px 12px 2px',
-                    borderTop: '1px solid var(--border-subtle)',
-                    paddingTop: '4px',
-                  }}
+                style={{
+                  margin: '2px 12px 2px',
+                  borderTop: '1px solid var(--border-subtle)',
+                  paddingTop: '2px',
+                }}
                 />
                 {launchedApps.map((app) => {
                   const Icon = launchableAppIconMap[app.iconKey];
@@ -586,7 +586,7 @@ export function LeftPanel({
               onClick={() => toggleSection('pipelines')}
               style={{
                 width: '100%',
-                padding: '10px 12px 4px',
+                padding: '6px 12px 2px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
@@ -619,7 +619,7 @@ export function LeftPanel({
                   display: 'flex',
                   alignItems: 'center',
                   gap: '12px',
-                  padding: '6px 12px',
+                  padding: '4px 12px',
                   margin: '0 8px',
                   borderRadius: '6px',
                   background: 'transparent',
@@ -645,7 +645,7 @@ export function LeftPanel({
               onClick={() => toggleSection('data')}
               style={{
                 width: '100%',
-                padding: '10px 12px 4px',
+                padding: '6px 12px 2px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
@@ -675,7 +675,7 @@ export function LeftPanel({
                   display: 'flex',
                   alignItems: 'center',
                   gap: '12px',
-                  padding: '6px 12px',
+                  padding: '4px 12px',
                   margin: '0 8px',
                   borderRadius: '6px',
                   background: 'transparent',
@@ -742,7 +742,7 @@ export function LeftPanel({
       )}
       {collapsed && (
         <>
-          <nav style={{ flex: 1, overflow: 'auto', padding: '4px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+          <nav style={{ flex: 1, overflow: 'auto', padding: '2px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
             <button
               type="button"
               onClick={() => onOpenApp(chatItem.type)}
