@@ -42,7 +42,7 @@ function EmptyState({ onOpenChat }: { onOpenChat: () => void }) {
         onClick={onOpenChat}
         style={{
           padding: '12px 24px',
-          background: 'var(--accent-shell)',
+          background: 'var(--accent-pipelines)',
           border: 'none',
           borderRadius: '8px',
           color: '#fff',
