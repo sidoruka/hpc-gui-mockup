@@ -82,6 +82,9 @@ const MOCK_TREE: Record<DataSectionId, FileTreeNode[]> = {
 
 export type DataSectionId = 'my-files' | 'shared-with-me' | 'common-data';
 
+/** MIME type for drag from file explorer; data: JSON { sectionId, relativePath } */
+export const FILE_EXPLORER_DRAG_TYPE = 'application/x-hpc-explorer-path';
+
 interface FileExplorerPanelProps {
   collapsed: boolean;
   width: number;
@@ -101,6 +104,7 @@ function TreeItem({
   node,
   depth,
   pathPrefix,
+  sectionId,
   expanded,
   onToggle,
   onOpenFile,
@@ -109,6 +113,7 @@ function TreeItem({
   depth: number;
   /** Parent path e.g. "my-files/documents" for building full file path */
   pathPrefix: string;
+  sectionId: DataSectionId;
   expanded: Record<string, boolean>;
   onToggle: (path: string) => void;
   onOpenFile?: (filePath: string) => void;
@@ -118,6 +123,7 @@ function TreeItem({
   const path = `${depth}-${node.name}`;
   const isExpanded = expanded[path];
   const fullPath = pathPrefix ? `${pathPrefix}/${node.name}` : node.name;
+  const relativePath = pathPrefix === sectionId ? node.name : fullPath.slice(sectionId.length + 1);
 
   const handleClick = () => {
     if (isFile) {
@@ -127,11 +133,18 @@ function TreeItem({
     }
   };
 
+  const handleDragStart = (e: React.DragEvent) => {
+    e.dataTransfer.setData(FILE_EXPLORER_DRAG_TYPE, JSON.stringify({ sectionId, relativePath }));
+    e.dataTransfer.effectAllowed = 'copy';
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <div
         role="button"
         tabIndex={0}
+        draggable
+        onDragStart={handleDragStart}
         onClick={handleClick}
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleClick()}
         style={{
@@ -187,6 +200,7 @@ function TreeItem({
               node={child}
               depth={depth + 1}
               pathPrefix={fullPath}
+              sectionId={sectionId}
               expanded={expanded}
               onToggle={onToggle}
               onOpenFile={onOpenFile}
@@ -326,6 +340,7 @@ export function FileExplorerPanel({
                       node={node}
                       depth={0}
                       pathPrefix={id}
+                      sectionId={id}
                       expanded={treeExpanded}
                       onToggle={toggleTreePath}
                       onOpenFile={onOpenFile}
