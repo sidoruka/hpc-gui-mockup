@@ -13,6 +13,7 @@ import {
   getTitleForType,
   generateLaunchedAppId,
   type TabType,
+  type Tab,
 } from './state/appState';
 import './styles/theme.css';
 
@@ -82,6 +83,23 @@ function App() {
   const stopLaunchedApp = useCallback((launchedAppId: string) => {
     dispatch({ type: 'STOP_LAUNCHED_APP', launchedAppId });
   }, []);
+
+  const handleOpenInNewWindow = useCallback((tab: Tab) => {
+    const params = new URLSearchParams();
+    params.set('standalone', tab.type);
+    params.set('title', tab.title);
+    if (tab.type === 'launched' && tab.launchedAppId) {
+      const app = state.launchedApps.find((a) => a.id === tab.launchedAppId);
+      if (app) {
+        params.set('launchedId', tab.launchedAppId);
+        params.set('appType', app.appType);
+        params.set('appName', app.name);
+      }
+    }
+    const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+    dispatch({ type: 'CLOSE_TAB', tabId: tab.id });
+  }, [state.launchedApps]);
 
   const handleResizeStart = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -175,6 +193,7 @@ function App() {
         launchedApps={state.launchedApps}
         onSelectTab={(id) => dispatch({ type: 'SET_ACTIVE_TAB', tabId: id })}
         onCloseTab={(id) => dispatch({ type: 'CLOSE_TAB', tabId: id })}
+        onOpenInNewWindow={handleOpenInNewWindow}
         onCloseAllTabs={() => dispatch({ type: 'CLOSE_ALL_TABS' })}
         onCloseOtherTabs={(keepTabId) => dispatch({ type: 'CLOSE_OTHER_TABS', keepTabId })}
         onReorderTabs={(from, to) => dispatch({ type: 'REORDER_TABS', fromIndex: from, toIndex: to })}

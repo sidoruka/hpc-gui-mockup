@@ -67,6 +67,7 @@ interface RightPaneProps {
   launchedApps: LaunchedApp[];
   onSelectTab: (id: string) => void;
   onCloseTab: (id: string) => void;
+  onOpenInNewWindow?: (tab: Tab) => void;
   onCloseAllTabs: () => void;
   onCloseOtherTabs: (keepTabId: string) => void;
   onReorderTabs: (fromIndex: number, toIndex: number) => void;
@@ -92,6 +93,7 @@ export function RightPane({
   launchedApps,
   onSelectTab,
   onCloseTab,
+  onOpenInNewWindow,
   onCloseAllTabs,
   onCloseOtherTabs,
   onReorderTabs,
@@ -114,6 +116,7 @@ export function RightPane({
         activeTabId={activeTabId}
         onSelectTab={onSelectTab}
         onCloseTab={onCloseTab}
+        onOpenInNewWindow={onOpenInNewWindow}
         onCloseAllTabs={onCloseAllTabs}
         onCloseOtherTabs={onCloseOtherTabs}
         onReorder={onReorderTabs}

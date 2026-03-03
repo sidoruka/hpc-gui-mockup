@@ -15,7 +15,7 @@ import {
   horizontalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { X } from 'lucide-react';
+import { X, Maximize2 } from 'lucide-react';
 import type { Tab } from '../state/appState';
 
 const contextMenuStyle: React.CSSProperties = {
@@ -46,6 +46,7 @@ interface TabBarProps {
   activeTabId: string | null;
   onSelectTab: (id: string) => void;
   onCloseTab: (id: string) => void;
+  onOpenInNewWindow?: (tab: Tab) => void;
   onCloseAllTabs: () => void;
   onCloseOtherTabs: (keepTabId: string) => void;
   onReorder: (fromIndex: number, toIndex: number) => void;
@@ -56,12 +57,14 @@ function SortableTab({
   isActive,
   onSelect,
   onClose,
+  onOpenInNewWindow,
   onContextMenu,
 }: {
   tab: Tab;
   isActive: boolean;
   onSelect: () => void;
   onClose: () => void;
+  onOpenInNewWindow?: (tab: Tab) => void;
   onContextMenu: (e: React.MouseEvent) => void;
 }) {
   const {
@@ -112,6 +115,27 @@ function SortableTab({
       >
         {tab.title}
       </span>
+      {onOpenInNewWindow && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onOpenInNewWindow(tab);
+          }}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            color: 'var(--text-secondary)',
+            cursor: 'pointer',
+            padding: '2px',
+            display: 'flex',
+            borderRadius: '4px',
+          }}
+          title="Full size (open in new window)"
+        >
+          <Maximize2 size={14} />
+        </button>
+      )}
       <button
         type="button"
         onClick={(e) => {
@@ -142,6 +166,7 @@ export function TabBar({
   activeTabId,
   onSelectTab,
   onCloseTab,
+  onOpenInNewWindow,
   onCloseAllTabs,
   onCloseOtherTabs,
   onReorder,
@@ -202,6 +227,7 @@ export function TabBar({
               isActive={activeTabId === tab.id}
               onSelect={() => onSelectTab(tab.id)}
               onClose={() => onCloseTab(tab.id)}
+              onOpenInNewWindow={onOpenInNewWindow}
               onContextMenu={(e) => handleTabContextMenu(e, tab.id)}
             />
           ))}
