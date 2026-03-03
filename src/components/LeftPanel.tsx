@@ -282,13 +282,8 @@ export function LeftPanel({
                   minWidth: 0,
                 }}
               >
-                {sectionsExpanded.apps ? (
-                  <ChevronDown size={12} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
-                ) : (
-                  <ChevronRight size={12} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
-                )}
                 <LayoutGrid size={14} color="var(--text-secondary)" />
-                <span style={{ fontWeight: 600, fontSize: '13px' }}>
+                <span style={{ flex: 1, fontWeight: 600, fontSize: '13px', minWidth: 0, textAlign: 'left' }}>
                   Apps ({appsGroup.length + launchedApps.length})
                 </span>
               </button>
@@ -317,6 +312,28 @@ export function LeftPanel({
                 }}
               >
                 <Plus size={14} />
+              </button>
+              <button
+                type="button"
+                onClick={() => toggleSection('apps')}
+                title={sectionsExpanded.apps ? 'Collapse' : 'Expand'}
+                style={{
+                  padding: '4px',
+                  background: 'transparent',
+                  border: 'none',
+                  borderRadius: '6px',
+                  color: 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {sectionsExpanded.apps ? (
+                  <ChevronDown size={12} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
+                ) : (
+                  <ChevronRight size={12} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
+                )}
               </button>
             </div>
             {sectionsExpanded.apps && (
@@ -460,13 +477,13 @@ export function LeftPanel({
                 textAlign: 'left',
               }}
             >
+              <Workflow size={14} color="var(--text-secondary)" />
+              <span style={{ flex: 1, fontWeight: 600, fontSize: '13px', minWidth: 0, textAlign: 'left' }}>Pipelines</span>
               {sectionsExpanded.pipelines ? (
                 <ChevronDown size={12} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
               ) : (
                 <ChevronRight size={12} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
               )}
-              <Workflow size={14} color="var(--text-secondary)" />
-              <span style={{ fontWeight: 600, fontSize: '13px' }}>Pipelines</span>
             </button>
             {sectionsExpanded.pipelines && (
             <>
@@ -527,17 +544,17 @@ export function LeftPanel({
                 textAlign: 'left',
               }}
             >
+              <Folder size={14} color="var(--text-secondary)" />
+              <span style={{ flex: 1, fontWeight: 600, fontSize: '13px', minWidth: 0, textAlign: 'left' }}>Data</span>
               {sectionsExpanded.data ? (
                 <ChevronDown size={12} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
               ) : (
                 <ChevronRight size={12} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
               )}
-              <Folder size={14} color="var(--text-secondary)" />
-              <span style={{ fontWeight: 600, fontSize: '13px' }}>Data</span>
             </button>
             {sectionsExpanded.data && (
             <>
-            {dataGroup.map(({ type, icon: Icon, color }) => (
+            {dataGroup.map(({ type, icon: Icon }) => (
               <button
                 key={type}
                 type="button"
@@ -561,14 +578,14 @@ export function LeftPanel({
                     width: 28,
                     height: 28,
                     borderRadius: '6px',
-                    background: color,
+                    background: 'transparent',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     flexShrink: 0,
                   }}
                 >
-                  <Icon size={12} color="#fff" />
+                  <Icon size={15} color="var(--text-secondary)" />
                 </div>
                 {getTitleForType(type)}
               </button>
@@ -771,7 +788,7 @@ export function LeftPanel({
                 })}
               </>
             )}
-            {dataGroup.map(({ type, icon: Icon, color }) => (
+            {dataGroup.map(({ type, icon: Icon }) => (
               <button
                 key={type}
                 type="button"
@@ -795,13 +812,13 @@ export function LeftPanel({
                     width: 28,
                     height: 28,
                     borderRadius: '6px',
-                    background: color,
+                    background: 'transparent',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
                 >
-                  <Icon size={12} color="#fff" />
+                  <Icon size={15} color="var(--text-secondary)" />
                 </div>
               </button>
             ))}
