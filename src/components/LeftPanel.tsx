@@ -87,18 +87,24 @@ export function LeftPanel({
   const [launchDialogOpen, setLaunchDialogOpen] = useState(false);
   const [stopConfirmApp, setStopConfirmApp] = useState<LaunchedApp | null>(null);
   const [openMenuAppId, setOpenMenuAppId] = useState<string | null>(null);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const menuContainerRef = useRef<HTMLDivElement | null>(null);
+  const userMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (openMenuAppId === null) return;
+    if (openMenuAppId === null && !userMenuOpen) return;
     const handleClickOutside = (e: MouseEvent) => {
-      if (menuContainerRef.current && !menuContainerRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      if (openMenuAppId !== null && menuContainerRef.current && !menuContainerRef.current.contains(target)) {
         setOpenMenuAppId(null);
+      }
+      if (userMenuOpen && userMenuRef.current && !userMenuRef.current.contains(target)) {
+        setUserMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [openMenuAppId]);
+  }, [openMenuAppId, userMenuOpen]);
 
   const [sectionsExpanded, setSectionsExpanded] = useState({
     apps: true,
@@ -661,23 +667,97 @@ export function LeftPanel({
               gap: '10px',
             }}
           >
-            <div
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: '50%',
-                background: 'var(--bg-active)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-              }}
-            >
-              <User size={14} color="var(--text-secondary)" />
+            <div ref={userMenuOpen ? userMenuRef : undefined} style={{ position: 'relative', flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <button
+                type="button"
+                onClick={() => setUserMenuOpen((open) => !open)}
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '4px 0',
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-primary)',
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                  textAlign: 'left',
+                  borderRadius: '6px',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--bg-hover)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                }}
+                title="User menu"
+              >
+                <div
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: '50%',
+                    background: userMenuOpen ? 'var(--bg-hover)' : 'var(--bg-active)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <User size={14} color="var(--text-secondary)" />
+                </div>
+                <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  User
+                </span>
+              </button>
+              {userMenuOpen && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    bottom: '100%',
+                    marginBottom: '4px',
+                    minWidth: '160px',
+                    background: 'var(--bg-sidebar)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: '6px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                    padding: '4px 0',
+                    zIndex: 100,
+                  }}
+                >
+                  {['Profile', 'Appearance', 'Usage statistics'].map((label) => (
+                    <button
+                      key={label}
+                      type="button"
+                      onClick={() => setUserMenuOpen(false)}
+                      style={{
+                        width: '100%',
+                        padding: '8px 12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--text-primary)',
+                        cursor: 'pointer',
+                        fontSize: '13px',
+                        textAlign: 'left',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'var(--bg-hover)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
+                      }}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-            <span style={{ flex: 1, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              User
-            </span>
             <button
               type="button"
               onClick={onToggleSidebar}
@@ -843,18 +923,71 @@ export function LeftPanel({
               gap: '8px',
             }}
           >
-            <div
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: '50%',
-                background: 'var(--bg-active)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <User size={14} color="var(--text-secondary)" />
+            <div ref={userMenuOpen ? userMenuRef : undefined} style={{ position: 'relative' }}>
+              <button
+                type="button"
+                onClick={() => setUserMenuOpen((open) => !open)}
+                title="User menu"
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  background: userMenuOpen ? 'var(--bg-hover)' : 'var(--bg-active)',
+                  border: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: 'var(--text-secondary)',
+                }}
+              >
+                <User size={14} color="var(--text-secondary)" />
+              </button>
+              {userMenuOpen && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: '100%',
+                    bottom: 0,
+                    marginLeft: '4px',
+                    minWidth: '160px',
+                    background: 'var(--bg-sidebar)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: '6px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                    padding: '4px 0',
+                    zIndex: 100,
+                  }}
+                >
+                  {['Profile', 'Appearance', 'Usage statistics'].map((label) => (
+                    <button
+                      key={label}
+                      type="button"
+                      onClick={() => setUserMenuOpen(false)}
+                      style={{
+                        width: '100%',
+                        padding: '8px 12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--text-primary)',
+                        cursor: 'pointer',
+                        fontSize: '13px',
+                        textAlign: 'left',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'var(--bg-hover)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
+                      }}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             <button
               type="button"
