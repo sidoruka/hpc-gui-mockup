@@ -1008,6 +1008,86 @@ export function LeftPanel({
                 })}
               </>
             )}
+            <div
+              style={{
+                width: 24,
+                height: 1,
+                background: 'var(--border-subtle)',
+                margin: '4px 0',
+                flexShrink: 0,
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => onOpenApp('all-pipelines')}
+              title="All pipelines"
+              style={{
+                width: 40,
+                height: 40,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'transparent',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                flexShrink: 0,
+              }}
+              {...getNavItemHover('all-pipelines')}
+            >
+              <LeftPaneNavIcon
+                icon={Workflow}
+                iconColor={hoveredNavKey === 'all-pipelines' ? 'var(--accent-pipelines)' : 'var(--text-secondary)'}
+                iconSize={15}
+              />
+            </button>
+            <button
+              type="button"
+              onClick={() => onOpenApp('runs')}
+              title="Runs"
+              style={{
+                width: 40,
+                height: 40,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'transparent',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                flexShrink: 0,
+                position: 'relative',
+              }}
+              {...getNavItemHover('runs')}
+            >
+              <LeftPaneNavIcon
+                icon={List}
+                iconColor={hoveredNavKey === 'runs' ? 'var(--accent-pipelines)' : 'var(--text-secondary)'}
+                iconSize={15}
+              />
+              {runningPipelinesCount > 0 && (
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: 2,
+                    right: 2,
+                    minWidth: '16px',
+                    height: '16px',
+                    padding: '0 4px',
+                    borderRadius: '8px',
+                    background: 'var(--accent-pipelines)',
+                    color: '#fff',
+                    fontSize: '10px',
+                    fontWeight: 600,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {runningPipelinesCount}
+                </span>
+              )}
+            </button>
           </nav>
           <div
             style={{
