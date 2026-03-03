@@ -497,14 +497,14 @@ export function LeftPanel({
                     width: 28,
                     height: 28,
                     borderRadius: '6px',
-                    background: 'var(--accent-launch)',
+                    background: 'transparent',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     flexShrink: 0,
                   }}
                 >
-                  <Icon size={12} color="#fff" />
+                  <Icon size={15} color="var(--text-secondary)" />
                 </div>
                 {label}
               </button>
