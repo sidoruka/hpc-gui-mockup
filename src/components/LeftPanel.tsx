@@ -27,6 +27,7 @@ import { JupyterIcon } from './icons/JupyterIcon';
 import { RStudioIcon } from './icons/RStudioIcon';
 import { VSCodeIcon } from './icons/VSCodeIcon';
 import { LaunchDialog } from './LaunchDialog';
+import { LeftPaneNavIcon } from './LeftPaneNavIcon';
 import { launchableAppIconMap } from './launchableAppIcons';
 
 interface NavItem {
@@ -258,20 +259,11 @@ export function LeftPanel({
                 textAlign: 'left',
               }}
             >
-              <div
-                style={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: '6px',
-                  background: chatItem.color,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                <MessageCircle size={12} color="#fff" />
-              </div>
+              <LeftPaneNavIcon
+                icon={MessageCircle}
+                iconColor="var(--text-secondary)"
+                iconSize={15}
+              />
               {getTitleForType(chatItem.type)}
             </button>
             <div
@@ -360,26 +352,21 @@ export function LeftPanel({
                 onClick={() => onOpenApp(type)}
                 style={navButtonStyle}
               >
-                <div
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: '6px',
-                    background: color,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}
+                <LeftPaneNavIcon
+                  iconColor="var(--text-secondary)"
+                  iconSize={15}
+                  icon={type === 'rstudio' || type === 'vscode' ? undefined : Icon}
                 >
                   {type === 'rstudio' ? (
-                    <RStudioIcon size={12} color="#fff" circleColor={color} />
+                    <span style={{ filter: 'grayscale(1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <RStudioIcon size={15} />
+                    </span>
                   ) : type === 'vscode' ? (
-                    <VSCodeIcon size={15} />
-                  ) : (
-                    <Icon size={12} color="#fff" />
-                  )}
-                </div>
+                    <span style={{ filter: 'grayscale(1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <VSCodeIcon size={15} />
+                    </span>
+                  ) : undefined}
+                </LeftPaneNavIcon>
                 {getTitleForType(type)}
               </button>
             ))}
@@ -418,24 +405,16 @@ export function LeftPanel({
                           cursor: isLaunching ? 'not-allowed' : 'pointer',
                         }}
                       >
-                        <div
-                          style={{
-                            width: 28,
-                            height: 28,
-                            borderRadius: '6px',
-                            background: 'var(--accent-launch)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            flexShrink: 0,
-                          }}
+                        <LeftPaneNavIcon
+                          iconColor="var(--text-secondary)"
+                          iconSize={15}
                         >
                           {isLaunching ? (
-                            <Loader2 size={12} color="#fff" style={{ animation: 'spin 1s linear infinite' }} />
+                            <Loader2 size={15} color="var(--text-secondary)" style={{ animation: 'spin 1s linear infinite' }} />
                           ) : (
-                            <IconComponent size={12} color="#fff" />
+                            <IconComponent size={15} color="var(--text-secondary)" />
                           )}
-                        </div>
+                        </LeftPaneNavIcon>
                         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {app.name}
                         </span>
@@ -630,20 +609,7 @@ export function LeftPanel({
                   textAlign: 'left',
                 }}
               >
-                <div
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: '6px',
-                    background: 'transparent',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}
-                >
-                  <Icon size={15} color="var(--text-secondary)" />
-                </div>
+                <LeftPaneNavIcon icon={Icon} />
                 {label}
               </button>
             ))}
@@ -693,20 +659,7 @@ export function LeftPanel({
                   textAlign: 'left',
                 }}
               >
-                <div
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: '6px',
-                    background: 'transparent',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}
-                >
-                  <Icon size={15} color="var(--text-secondary)" />
-                </div>
+                <LeftPaneNavIcon icon={Icon} />
                 {getTitleForType(type)}
               </button>
             ))}
@@ -776,19 +729,11 @@ export function LeftPanel({
                 flexShrink: 0,
               }}
             >
-              <div
-                style={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: '6px',
-                  background: chatItem.color,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <MessageCircle size={12} color="#fff" />
-              </div>
+              <LeftPaneNavIcon
+                icon={MessageCircle}
+                iconColor="var(--text-secondary)"
+                iconSize={15}
+              />
             </button>
             <button
               type="button"
@@ -829,25 +774,21 @@ export function LeftPanel({
                   flexShrink: 0,
                 }}
               >
-                <div
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: '6px',
-                    background: color,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
+                <LeftPaneNavIcon
+                  iconColor="var(--text-secondary)"
+                  iconSize={15}
+                  icon={type === 'rstudio' || type === 'vscode' ? undefined : Icon}
                 >
                   {type === 'rstudio' ? (
-                    <RStudioIcon size={12} color="#fff" circleColor={color} />
+                    <span style={{ filter: 'grayscale(1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <RStudioIcon size={15} />
+                    </span>
                   ) : type === 'vscode' ? (
-                    <VSCodeIcon size={15} />
-                  ) : (
-                    <Icon size={12} color="#fff" />
-                  )}
-                </div>
+                    <span style={{ filter: 'grayscale(1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <VSCodeIcon size={15} />
+                    </span>
+                  ) : undefined}
+                </LeftPaneNavIcon>
               </button>
             ))}
             {launchedApps.length > 0 && (
@@ -886,23 +827,16 @@ export function LeftPanel({
                         opacity: isLaunching ? 0.7 : 1,
                       }}
                     >
-                      <div
-                        style={{
-                          width: 28,
-                          height: 28,
-                          borderRadius: '6px',
-                          background: 'var(--accent-launch)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
+                      <LeftPaneNavIcon
+                        iconColor="var(--text-secondary)"
+                        iconSize={15}
                       >
                         {isLaunching ? (
-                          <Loader2 size={12} color="#fff" style={{ animation: 'spin 1s linear infinite' }} />
+                          <Loader2 size={15} color="var(--text-secondary)" style={{ animation: 'spin 1s linear infinite' }} />
                         ) : (
-                          <IconComponent size={12} color="#fff" />
+                          <IconComponent size={15} color="var(--text-secondary)" />
                         )}
-                      </div>
+                      </LeftPaneNavIcon>
                     </button>
                   );
                 })}
@@ -927,19 +861,7 @@ export function LeftPanel({
                   flexShrink: 0,
                 }}
               >
-                <div
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: '6px',
-                    background: 'transparent',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Icon size={15} color="var(--text-secondary)" />
-                </div>
+                <LeftPaneNavIcon icon={Icon} />
               </button>
             ))}
           </nav>
