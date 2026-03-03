@@ -25,11 +25,10 @@ const SECTION_CONFIG: {
   id: DataSectionId;
   label: string;
   icon: React.ElementType;
-  color: string;
 }[] = [
-  { id: 'my-files', label: 'My files', icon: Folder, color: 'var(--accent-files)' },
-  { id: 'shared-with-me', label: 'Shared with me', icon: Share2, color: 'var(--accent-shared)' },
-  { id: 'common-data', label: 'Common data', icon: Database, color: 'var(--accent-common)' },
+  { id: 'my-files', label: 'My files', icon: Folder },
+  { id: 'shared-with-me', label: 'Shared with me', icon: Share2 },
+  { id: 'common-data', label: 'Common data', icon: Database },
 ];
 
 const MOCK_TREE: Record<DataSectionId, FileTreeNode[]> = {
@@ -159,14 +158,14 @@ function TreeItem({
         </span>
         {isFile ? (
           node.name.endsWith('.pdf') || node.name.endsWith('.pptx') ? (
-            <FileText size={16} color="#d83b01" style={{ flexShrink: 0 }} />
+            <FileText size={16} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
           ) : (
             <File size={16} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
           )
         ) : isExpanded ? (
-          <FolderOpen size={16} color="var(--accent-files)" style={{ flexShrink: 0 }} />
+          <FolderOpen size={16} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
         ) : (
-          <Folder size={16} color="var(--accent-files)" style={{ flexShrink: 0 }} />
+          <Folder size={16} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
         )}
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {node.name}
@@ -282,7 +281,7 @@ export function FileExplorerPanel({
         Data Explorer
       </div>
       <div style={{ flex: 1, overflow: 'auto', padding: '4px 0' }}>
-        {SECTION_CONFIG.map(({ id, label, icon: Icon, color }) => {
+        {SECTION_CONFIG.map(({ id, label, icon: Icon }) => {
           const isExpanded = sectionsExpanded[id];
           const nodes = MOCK_TREE[id];
           return (
@@ -319,7 +318,7 @@ export function FileExplorerPanel({
                 ) : (
                   <ChevronRight size={14} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
                 )}
-                <Icon size={16} color={color} style={{ flexShrink: 0 }} />
+                <Icon size={16} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
                 <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</span>
               </button>
               {isExpanded && nodes && (
