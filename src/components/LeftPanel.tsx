@@ -72,6 +72,8 @@ const navButtonStyle = {
   alignItems: 'center' as const,
   gap: '12px',
   padding: '6px 12px',
+  margin: '0 8px' as const,
+  borderRadius: '6px',
   background: 'transparent',
   border: 'none',
   color: 'var(--text-primary)',
@@ -111,9 +113,21 @@ export function LeftPanel({
     pipelines: true,
     data: true,
   });
+  const [hoveredNavKey, setHoveredNavKey] = useState<string | null>(null);
 
   const toggleSection = (key: keyof typeof sectionsExpanded) =>
     setSectionsExpanded((prev) => ({ ...prev, [key]: !prev[key] }));
+
+  const getNavItemHover = (navKey: string) => ({
+    onMouseEnter: (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.currentTarget.style.background = 'var(--bg-hover)';
+      setHoveredNavKey(navKey);
+    },
+    onMouseLeave: (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.currentTarget.style.background = 'transparent';
+      setHoveredNavKey(null);
+    },
+  });
 
   return (
     <aside
@@ -251,6 +265,8 @@ export function LeftPanel({
                 alignItems: 'center',
                 gap: '12px',
                 padding: '6px 12px',
+                margin: '0 8px',
+                borderRadius: '6px',
                 background: 'transparent',
                 border: 'none',
                 color: 'var(--text-primary)',
@@ -258,10 +274,11 @@ export function LeftPanel({
                 fontSize: '14px',
                 textAlign: 'left',
               }}
+              {...getNavItemHover('chat')}
             >
               <LeftPaneNavIcon
                 icon={MessageCircle}
-                iconColor="var(--text-secondary)"
+                iconColor={hoveredNavKey === 'chat' ? chatItem.color : 'var(--text-secondary)'}
                 iconSize={15}
               />
               {getTitleForType(chatItem.type)}
@@ -351,18 +368,19 @@ export function LeftPanel({
                 type="button"
                 onClick={() => onOpenApp(type)}
                 style={navButtonStyle}
+                {...getNavItemHover(type)}
               >
                 <LeftPaneNavIcon
-                  iconColor="var(--text-secondary)"
+                  iconColor={hoveredNavKey === type ? color : 'var(--text-secondary)'}
                   iconSize={15}
                   icon={type === 'rstudio' || type === 'vscode' ? undefined : Icon}
                 >
                   {type === 'rstudio' ? (
-                    <span style={{ filter: 'grayscale(1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ filter: hoveredNavKey === type ? 'none' : 'grayscale(1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <RStudioIcon size={15} />
                     </span>
                   ) : type === 'vscode' ? (
-                    <span style={{ filter: 'grayscale(1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ filter: hoveredNavKey === type ? 'none' : 'grayscale(1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <VSCodeIcon size={15} />
                     </span>
                   ) : undefined}
@@ -404,15 +422,16 @@ export function LeftPanel({
                           opacity: isLaunching ? 0.7 : 1,
                           cursor: isLaunching ? 'not-allowed' : 'pointer',
                         }}
+                        {...getNavItemHover(`launched-${app.id}`)}
                       >
                         <LeftPaneNavIcon
-                          iconColor="var(--text-secondary)"
+                          iconColor={hoveredNavKey === `launched-${app.id}` ? 'var(--accent-launch)' : 'var(--text-secondary)'}
                           iconSize={15}
                         >
                           {isLaunching ? (
-                            <Loader2 size={15} color="var(--text-secondary)" style={{ animation: 'spin 1s linear infinite' }} />
+                            <Loader2 size={15} color={hoveredNavKey === `launched-${app.id}` ? 'var(--accent-launch)' : 'var(--text-secondary)'} style={{ animation: 'spin 1s linear infinite' }} />
                           ) : (
-                            <IconComponent size={15} color="var(--text-secondary)" />
+                            <IconComponent size={15} color={hoveredNavKey === `launched-${app.id}` ? 'var(--accent-launch)' : 'var(--text-secondary)'} />
                           )}
                         </LeftPaneNavIcon>
                         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -588,9 +607,9 @@ export function LeftPanel({
             {sectionsExpanded.pipelines && (
             <>
             {[
-              { label: 'All pipelines', icon: Workflow, tabType: 'all-pipelines' as const },
-              { label: 'Runs', icon: List, tabType: null },
-            ].map(({ label, icon: Icon, tabType }) => (
+              { label: 'All pipelines', icon: Workflow, tabType: 'all-pipelines' as const, navKey: 'all-pipelines' as const },
+              { label: 'Runs', icon: List, tabType: null, navKey: 'runs' as const },
+            ].map(({ label, icon: Icon, tabType, navKey }) => (
               <button
                 key={label}
                 type="button"
@@ -601,6 +620,8 @@ export function LeftPanel({
                   alignItems: 'center',
                   gap: '12px',
                   padding: '6px 12px',
+                  margin: '0 8px',
+                  borderRadius: '6px',
                   background: 'transparent',
                   border: 'none',
                   color: 'var(--text-primary)',
@@ -608,8 +629,12 @@ export function LeftPanel({
                   fontSize: '14px',
                   textAlign: 'left',
                 }}
+                {...getNavItemHover(navKey)}
               >
-                <LeftPaneNavIcon icon={Icon} />
+                <LeftPaneNavIcon
+                  icon={Icon}
+                  iconColor={hoveredNavKey === navKey ? 'var(--accent-pipelines)' : 'var(--text-secondary)'}
+                />
                 {label}
               </button>
             ))}
@@ -640,7 +665,7 @@ export function LeftPanel({
             </button>
             {sectionsExpanded.data && (
             <>
-            {dataGroup.map(({ type, icon: Icon }) => (
+            {dataGroup.map(({ type, icon: Icon, color }) => (
               <button
                 key={type}
                 type="button"
@@ -651,6 +676,8 @@ export function LeftPanel({
                   alignItems: 'center',
                   gap: '12px',
                   padding: '6px 12px',
+                  margin: '0 8px',
+                  borderRadius: '6px',
                   background: 'transparent',
                   border: 'none',
                   color: 'var(--text-primary)',
@@ -658,8 +685,12 @@ export function LeftPanel({
                   fontSize: '14px',
                   textAlign: 'left',
                 }}
+                {...getNavItemHover(type)}
               >
-                <LeftPaneNavIcon icon={Icon} />
+                <LeftPaneNavIcon
+                  icon={Icon}
+                  iconColor={hoveredNavKey === type ? color : 'var(--text-secondary)'}
+                />
                 {getTitleForType(type)}
               </button>
             ))}
@@ -728,10 +759,11 @@ export function LeftPanel({
                 cursor: 'pointer',
                 flexShrink: 0,
               }}
+              {...getNavItemHover('chat')}
             >
               <LeftPaneNavIcon
                 icon={MessageCircle}
-                iconColor="var(--text-secondary)"
+                iconColor={hoveredNavKey === 'chat' ? chatItem.color : 'var(--text-secondary)'}
                 iconSize={15}
               />
             </button>
@@ -750,8 +782,9 @@ export function LeftPanel({
                 borderRadius: '6px',
                 cursor: 'pointer',
                 flexShrink: 0,
-                color: 'var(--text-secondary)',
+                color: hoveredNavKey === 'launch' ? 'var(--accent-launch)' : 'var(--text-secondary)',
               }}
+              {...getNavItemHover('launch')}
             >
               <Plus size={15} />
             </button>
@@ -773,18 +806,19 @@ export function LeftPanel({
                   cursor: 'pointer',
                   flexShrink: 0,
                 }}
+                {...getNavItemHover(type)}
               >
                 <LeftPaneNavIcon
-                  iconColor="var(--text-secondary)"
+                  iconColor={hoveredNavKey === type ? color : 'var(--text-secondary)'}
                   iconSize={15}
                   icon={type === 'rstudio' || type === 'vscode' ? undefined : Icon}
                 >
                   {type === 'rstudio' ? (
-                    <span style={{ filter: 'grayscale(1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ filter: hoveredNavKey === type ? 'none' : 'grayscale(1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <RStudioIcon size={15} />
                     </span>
                   ) : type === 'vscode' ? (
-                    <span style={{ filter: 'grayscale(1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ filter: hoveredNavKey === type ? 'none' : 'grayscale(1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <VSCodeIcon size={15} />
                     </span>
                   ) : undefined}
@@ -826,15 +860,16 @@ export function LeftPanel({
                         flexShrink: 0,
                         opacity: isLaunching ? 0.7 : 1,
                       }}
+                      {...getNavItemHover(`launched-${app.id}`)}
                     >
                       <LeftPaneNavIcon
-                        iconColor="var(--text-secondary)"
+                        iconColor={hoveredNavKey === `launched-${app.id}` ? 'var(--accent-launch)' : 'var(--text-secondary)'}
                         iconSize={15}
                       >
                         {isLaunching ? (
-                          <Loader2 size={15} color="var(--text-secondary)" style={{ animation: 'spin 1s linear infinite' }} />
+                          <Loader2 size={15} color={hoveredNavKey === `launched-${app.id}` ? 'var(--accent-launch)' : 'var(--text-secondary)'} style={{ animation: 'spin 1s linear infinite' }} />
                         ) : (
-                          <IconComponent size={15} color="var(--text-secondary)" />
+                          <IconComponent size={15} color={hoveredNavKey === `launched-${app.id}` ? 'var(--accent-launch)' : 'var(--text-secondary)'} />
                         )}
                       </LeftPaneNavIcon>
                     </button>
@@ -842,7 +877,7 @@ export function LeftPanel({
                 })}
               </>
             )}
-            {dataGroup.map(({ type, icon: Icon }) => (
+            {dataGroup.map(({ type, icon: Icon, color }) => (
               <button
                 key={type}
                 type="button"
@@ -860,8 +895,12 @@ export function LeftPanel({
                   cursor: 'pointer',
                   flexShrink: 0,
                 }}
+                {...getNavItemHover(type)}
               >
-                <LeftPaneNavIcon icon={Icon} />
+                <LeftPaneNavIcon
+                  icon={Icon}
+                  iconColor={hoveredNavKey === type ? color : 'var(--text-secondary)'}
+                />
               </button>
             ))}
           </nav>

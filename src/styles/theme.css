@@ -17,6 +17,7 @@
   --accent-common: #8764b8;
   --accent-chat: #7b2cbf;
   --accent-launch: #0d9488;
+  --accent-pipelines: #0ea5e9;
 }
 
 @keyframes spin {
