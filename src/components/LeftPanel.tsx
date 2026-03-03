@@ -608,7 +608,7 @@ export function LeftPanel({
             <>
             {[
               { label: 'All pipelines', icon: Workflow, tabType: 'all-pipelines' as const, navKey: 'all-pipelines' as const },
-              { label: 'Runs', icon: List, tabType: null, navKey: 'runs' as const },
+              { label: 'Runs', icon: List, tabType: 'runs' as const, navKey: 'runs' as const },
             ].map(({ label, icon: Icon, tabType, navKey }) => (
               <button
                 key={label}
