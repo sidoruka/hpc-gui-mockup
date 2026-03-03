@@ -19,8 +19,6 @@ export type FileTreeNode = {
   isFile?: boolean;
 };
 
-type DataSectionId = 'my-files' | 'shared-with-me' | 'common-data';
-
 const SECTION_CONFIG: {
   id: DataSectionId;
   label: string;
@@ -45,6 +43,8 @@ const MOCK_TREE: Record<DataSectionId, FileTreeNode[]> = {
     { name: 'documents', children: [
       { name: 'report.pdf', isFile: true },
       { name: 'notes.txt', isFile: true },
+      { name: 'page.html', isFile: true },
+      { name: 'diagram.png', isFile: true },
     ]},
     { name: 'scratch', children: [
       { name: 'data.csv', isFile: true },
@@ -80,12 +80,16 @@ const MOCK_TREE: Record<DataSectionId, FileTreeNode[]> = {
   ],
 };
 
+export type DataSectionId = 'my-files' | 'shared-with-me' | 'common-data';
+
 interface FileExplorerPanelProps {
   collapsed: boolean;
   width: number;
   isResizing?: boolean;
   onToggleSidebar: () => void;
   onOpenApp: (type: TabType) => void;
+  /** Open a file from the tree in the main pane (path e.g. my-files/documents/report.pdf) */
+  onOpenFile?: (filePath: string) => void;
 }
 
 const DEFAULT_WIDTH = 260;
@@ -96,24 +100,28 @@ const COLLAPSED_WIDTH = 48;
 function TreeItem({
   node,
   depth,
+  pathPrefix,
   expanded,
   onToggle,
   onOpenFile,
 }: {
   node: FileTreeNode;
   depth: number;
+  /** Parent path e.g. "my-files/documents" for building full file path */
+  pathPrefix: string;
   expanded: Record<string, boolean>;
   onToggle: (path: string) => void;
-  onOpenFile?: (path: string) => void;
+  onOpenFile?: (filePath: string) => void;
 }) {
   const isFile = node.isFile === true || (node.children?.length === 0 && !node.children);
   const hasChildren = node.children && node.children.length > 0;
   const path = `${depth}-${node.name}`;
   const isExpanded = expanded[path];
+  const fullPath = pathPrefix ? `${pathPrefix}/${node.name}` : node.name;
 
   const handleClick = () => {
     if (isFile) {
-      onOpenFile?.(path);
+      onOpenFile?.(fullPath);
     } else if (hasChildren) {
       onToggle(path);
     }
@@ -178,6 +186,7 @@ function TreeItem({
               key={child.name}
               node={child}
               depth={depth + 1}
+              pathPrefix={fullPath}
               expanded={expanded}
               onToggle={onToggle}
               onOpenFile={onOpenFile}
@@ -195,6 +204,7 @@ export function FileExplorerPanel({
   isResizing = false,
   onToggleSidebar,
   onOpenApp,
+  onOpenFile,
 }: FileExplorerPanelProps) {
   const [sectionsExpanded, setSectionsExpanded] = useState<Record<DataSectionId, boolean>>({
     'my-files': false,
@@ -315,8 +325,10 @@ export function FileExplorerPanel({
                       key={node.name}
                       node={node}
                       depth={0}
+                      pathPrefix={id}
                       expanded={treeExpanded}
                       onToggle={toggleTreePath}
+                      onOpenFile={onOpenFile}
                     />
                   ))}
                 </div>

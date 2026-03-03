@@ -70,6 +70,11 @@ function App() {
     }
   }, []);
 
+  const openFile = useCallback((filePath: string) => {
+    const fileName = filePath.split('/').pop() ?? filePath;
+    dispatch({ type: 'OPEN_APP', tabType: 'file', title: fileName, filePath });
+  }, []);
+
   const launchApp = useCallback((catalogAppId: string) => {
     const launchedAppId = generateLaunchedAppId();
     dispatch({ type: 'LAUNCH_APP', catalogAppId, launchedAppId });
@@ -221,6 +226,7 @@ function App() {
         isResizing={isResizingRight}
         onToggleSidebar={() => dispatch({ type: 'TOGGLE_RIGHT_SIDEBAR' })}
         onOpenApp={openApp}
+        onOpenFile={openFile}
       />
     </div>
   );

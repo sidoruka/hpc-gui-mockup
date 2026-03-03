@@ -10,7 +10,8 @@ export type TabType =
   | 'runs'
   | 'my-files'
   | 'shared-with-me'
-  | 'common-data';
+  | 'common-data'
+  | 'file';
 
 export interface Tab {
   id: string;
@@ -18,6 +19,8 @@ export interface Tab {
   title: string;
   /** Set when type is 'launched' */
   launchedAppId?: string;
+  /** Set when type is 'file' — virtual path e.g. my-files/documents/report.pdf */
+  filePath?: string;
 }
 
 export type LaunchedAppStatus = 'launching' | 'ready';
@@ -41,7 +44,7 @@ export interface AppState {
 }
 
 export type AppAction =
-  | { type: 'OPEN_APP'; tabType: TabType; title: string; launchedAppId?: string }
+  | { type: 'OPEN_APP'; tabType: TabType; title: string; launchedAppId?: string; filePath?: string }
   | { type: 'LAUNCH_APP'; catalogAppId: string; launchedAppId?: string }
   | { type: 'LAUNCHED_APP_READY'; launchedAppId: string }
   | { type: 'STOP_LAUNCHED_APP'; launchedAppId: string }
@@ -53,7 +56,7 @@ export type AppAction =
   | { type: 'TOGGLE_SIDEBAR' }
   | { type: 'TOGGLE_RIGHT_SIDEBAR' };
 
-const tabTypeTitles: Record<Exclude<TabType, 'launched'>, string> = {
+const tabTypeTitles: Record<Exclude<TabType, 'launched' | 'file'>, string> = {
   chat: 'Chat',
   shell: 'Shell',
   desktop: 'Desktop',
@@ -77,7 +80,8 @@ export function generateLaunchedAppId(): string {
 
 export function getTitleForType(type: TabType, launchedApp?: LaunchedApp | null): string {
   if (type === 'launched' && launchedApp) return launchedApp.name;
-  return tabTypeTitles[type as Exclude<TabType, 'launched'>] ?? type;
+  if (type === 'file') return type; // title comes from action (fileName)
+  return tabTypeTitles[type as Exclude<TabType, 'launched' | 'file'>] ?? type;
 }
 
 export function appReducer(state: AppState, action: AppAction): AppState {
@@ -85,7 +89,8 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     case 'OPEN_APP': {
       const match = (t: Tab) =>
         t.type === action.tabType &&
-        (action.tabType !== 'launched' || t.launchedAppId === action.launchedAppId);
+        (action.tabType !== 'launched' || t.launchedAppId === action.launchedAppId) &&
+        (action.tabType !== 'file' || t.filePath === action.filePath);
       const existing = state.openTabs.find(match);
       if (existing) {
         return { ...state, activeTabId: existing.id };
@@ -100,6 +105,9 @@ export function appReducer(state: AppState, action: AppAction): AppState {
         title,
         ...(action.tabType === 'launched' && action.launchedAppId
           ? { launchedAppId: action.launchedAppId }
+          : {}),
+        ...(action.tabType === 'file' && action.filePath
+          ? { filePath: action.filePath }
           : {}),
       };
       return {

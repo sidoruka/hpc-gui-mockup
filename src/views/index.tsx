@@ -6,6 +6,7 @@ import { JupyterView } from './JupyterView';
 import { RStudioView } from './RStudioView';
 import { VSCodeView } from './VSCodeView';
 import { FileBrowserView } from './FileBrowserView';
+import { FileViewerView } from './FileViewerView';
 import { AllPipelinesView } from './AllPipelinesView';
 import { RunsView } from './RunsView';
 
@@ -44,6 +45,8 @@ export function TabContent({ tabType, tab, launchedApps = [] }: TabContentProps)
     case 'shared-with-me':
     case 'common-data':
       return <FileBrowserView tabType={tabType} />;
+    case 'file':
+      return tab?.filePath ? <FileViewerView tab={tab} /> : null;
     default:
       return null;
   }
