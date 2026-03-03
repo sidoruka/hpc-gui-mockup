@@ -300,10 +300,6 @@ export function FileExplorerPanel({
               <button
                 type="button"
                 onClick={() => toggleSection(id)}
-                onDoubleClick={(e) => {
-                  e.stopPropagation();
-                  onOpenApp(id);
-                }}
                 style={{
                   width: '100%',
                   display: 'flex',
