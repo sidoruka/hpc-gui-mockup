@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  Search,
   MessageCircle,
   Terminal,
   Monitor,
@@ -235,31 +234,6 @@ export function LeftPanel({
       )}
       {!collapsed && (
         <>
-          <div
-            style={{
-              padding: '6px 12px',
-              margin: '4px 12px 0',
-              background: 'var(--bg-search)',
-              borderRadius: '20px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-            }}
-          >
-            <Search size={12} color="var(--text-secondary)" />
-            <input
-              type="text"
-              placeholder="Search"
-              style={{
-                flex: 1,
-                background: 'transparent',
-                border: 'none',
-                outline: 'none',
-                color: 'var(--text-primary)',
-                fontSize: '14px',
-              }}
-            />
-          </div>
           <nav style={{ flex: 1, overflow: 'auto', padding: '2px 0' }}>
             <button
               type="button"

@@ -267,19 +267,6 @@ export function FileExplorerPanel({
         transition: isResizing ? 'none' : 'width 0.2s ease',
       }}
     >
-      <div
-        style={{
-          padding: '8px 12px',
-          borderBottom: '1px solid var(--border-subtle)',
-          fontWeight: 600,
-          fontSize: '11px',
-          textTransform: 'uppercase',
-          letterSpacing: '0.5px',
-          color: 'var(--text-secondary)',
-        }}
-      >
-        Data Explorer
-      </div>
       <div style={{ flex: 1, overflow: 'auto', padding: '4px 0' }}>
         {SECTION_CONFIG.map(({ id, label, icon: Icon }) => {
           const isExpanded = sectionsExpanded[id];
