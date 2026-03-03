@@ -115,7 +115,7 @@ function SortableTab({
       >
         {tab.title}
       </span>
-      {onOpenInNewWindow && (
+      {onOpenInNewWindow && tab.type !== 'all-pipelines' && tab.type !== 'runs' && (
         <button
           type="button"
           onClick={(e) => {
