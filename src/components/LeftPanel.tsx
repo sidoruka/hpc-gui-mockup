@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  LayoutGrid,
   Search,
   MessageCircle,
   Terminal,
@@ -282,7 +281,6 @@ export function LeftPanel({
                   minWidth: 0,
                 }}
               >
-                <LayoutGrid size={14} color="var(--text-secondary)" />
                 <span style={{ flex: 1, fontWeight: 600, fontSize: '13px', minWidth: 0, textAlign: 'left' }}>
                   Apps ({appsGroup.length + launchedApps.length})
                 </span>
@@ -477,7 +475,6 @@ export function LeftPanel({
                 textAlign: 'left',
               }}
             >
-              <Workflow size={14} color="var(--text-secondary)" />
               <span style={{ flex: 1, fontWeight: 600, fontSize: '13px', minWidth: 0, textAlign: 'left' }}>Pipelines</span>
               {sectionsExpanded.pipelines ? (
                 <ChevronDown size={12} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
@@ -544,7 +541,6 @@ export function LeftPanel({
                 textAlign: 'left',
               }}
             >
-              <Folder size={14} color="var(--text-secondary)" />
               <span style={{ flex: 1, fontWeight: 600, fontSize: '13px', minWidth: 0, textAlign: 'left' }}>Data</span>
               {sectionsExpanded.data ? (
                 <ChevronDown size={12} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
