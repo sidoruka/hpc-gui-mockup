@@ -19,17 +19,17 @@ function EmptyState({ onOpenChat }: { onOpenChat: () => void }) {
     >
       <div
         style={{
-          width: 80,
-          height: 80,
+          width: 150,
+          height: 150,
           borderRadius: '16px',
-          background: 'var(--accent-chat)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          marginBottom: '24px',
+          marginBottom: '6px',
+          overflow: 'hidden',
         }}
       >
-        <MessageCircle size={40} color="#fff" />
+        <img src="/favicon.png" alt="" style={{ width: 150, height: 150, objectFit: 'contain' }} />
       </div>
       <h2 style={{ fontSize: '20px', fontWeight: 600, margin: '0 0 8px', color: 'var(--text-primary)' }}>
         Start with Chat
@@ -42,7 +42,7 @@ function EmptyState({ onOpenChat }: { onOpenChat: () => void }) {
         onClick={onOpenChat}
         style={{
           padding: '12px 24px',
-          background: 'var(--accent-chat)',
+          background: 'var(--accent-shell)',
           border: 'none',
           borderRadius: '8px',
           color: '#fff',
