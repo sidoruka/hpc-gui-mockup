@@ -245,7 +245,7 @@ function TreeItem({
           alignItems: 'center',
           gap: '6px',
           padding: '2px 8px',
-          marginLeft: depth * 12,
+          marginLeft: (depth === 0 ? 10 : 0) + depth * 12,
           cursor: 'pointer',
           borderRadius: '4px',
           fontSize: '13px',
