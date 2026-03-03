@@ -278,7 +278,7 @@ export function LeftPanel({
             >
               <LeftPaneNavIcon
                 icon={MessageCircle}
-                iconColor={hoveredNavKey === 'chat' ? chatItem.color : 'var(--text-secondary)'}
+                iconColor={hoveredNavKey === 'chat' ? 'var(--accent-pipelines)' : 'var(--text-secondary)'}
                 iconSize={15}
               />
               {getTitleForType(chatItem.type)}
@@ -371,7 +371,7 @@ export function LeftPanel({
                 {...getNavItemHover(type)}
               >
                 <LeftPaneNavIcon
-                  iconColor={hoveredNavKey === type ? color : 'var(--text-secondary)'}
+                  iconColor={hoveredNavKey === type ? 'var(--accent-pipelines)' : 'var(--text-secondary)'}
                   iconSize={15}
                   icon={type === 'rstudio' || type === 'vscode' ? undefined : Icon}
                 >
@@ -425,13 +425,13 @@ export function LeftPanel({
                         {...getNavItemHover(`launched-${app.id}`)}
                       >
                         <LeftPaneNavIcon
-                          iconColor={hoveredNavKey === `launched-${app.id}` ? 'var(--accent-launch)' : 'var(--text-secondary)'}
+                          iconColor={hoveredNavKey === `launched-${app.id}` ? 'var(--accent-pipelines)' : 'var(--text-secondary)'}
                           iconSize={15}
                         >
                           {isLaunching ? (
-                            <Loader2 size={15} color={hoveredNavKey === `launched-${app.id}` ? 'var(--accent-launch)' : 'var(--text-secondary)'} style={{ animation: 'spin 1s linear infinite' }} />
+                            <Loader2 size={15} color={hoveredNavKey === `launched-${app.id}` ? 'var(--accent-pipelines)' : 'var(--text-secondary)'} style={{ animation: 'spin 1s linear infinite' }} />
                           ) : (
-                            <IconComponent size={15} color={hoveredNavKey === `launched-${app.id}` ? 'var(--accent-launch)' : 'var(--text-secondary)'} />
+                            <IconComponent size={15} color={hoveredNavKey === `launched-${app.id}` ? 'var(--accent-pipelines)' : 'var(--text-secondary)'} />
                           )}
                         </LeftPaneNavIcon>
                         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -689,7 +689,7 @@ export function LeftPanel({
               >
                 <LeftPaneNavIcon
                   icon={Icon}
-                  iconColor={hoveredNavKey === type ? color : 'var(--text-secondary)'}
+                  iconColor={hoveredNavKey === type ? 'var(--accent-pipelines)' : 'var(--text-secondary)'}
                 />
                 {getTitleForType(type)}
               </button>
@@ -763,7 +763,7 @@ export function LeftPanel({
             >
               <LeftPaneNavIcon
                 icon={MessageCircle}
-                iconColor={hoveredNavKey === 'chat' ? chatItem.color : 'var(--text-secondary)'}
+                iconColor={hoveredNavKey === 'chat' ? 'var(--accent-pipelines)' : 'var(--text-secondary)'}
                 iconSize={15}
               />
             </button>
@@ -782,7 +782,7 @@ export function LeftPanel({
                 borderRadius: '6px',
                 cursor: 'pointer',
                 flexShrink: 0,
-                color: hoveredNavKey === 'launch' ? 'var(--accent-launch)' : 'var(--text-secondary)',
+                color: hoveredNavKey === 'launch' ? 'var(--accent-pipelines)' : 'var(--text-secondary)',
               }}
               {...getNavItemHover('launch')}
             >
@@ -809,7 +809,7 @@ export function LeftPanel({
                 {...getNavItemHover(type)}
               >
                 <LeftPaneNavIcon
-                  iconColor={hoveredNavKey === type ? color : 'var(--text-secondary)'}
+                  iconColor={hoveredNavKey === type ? 'var(--accent-pipelines)' : 'var(--text-secondary)'}
                   iconSize={15}
                   icon={type === 'rstudio' || type === 'vscode' ? undefined : Icon}
                 >
@@ -863,13 +863,13 @@ export function LeftPanel({
                       {...getNavItemHover(`launched-${app.id}`)}
                     >
                       <LeftPaneNavIcon
-                        iconColor={hoveredNavKey === `launched-${app.id}` ? 'var(--accent-launch)' : 'var(--text-secondary)'}
+                        iconColor={hoveredNavKey === `launched-${app.id}` ? 'var(--accent-pipelines)' : 'var(--text-secondary)'}
                         iconSize={15}
                       >
                         {isLaunching ? (
-                          <Loader2 size={15} color={hoveredNavKey === `launched-${app.id}` ? 'var(--accent-launch)' : 'var(--text-secondary)'} style={{ animation: 'spin 1s linear infinite' }} />
+                          <Loader2 size={15} color={hoveredNavKey === `launched-${app.id}` ? 'var(--accent-pipelines)' : 'var(--text-secondary)'} style={{ animation: 'spin 1s linear infinite' }} />
                         ) : (
-                          <IconComponent size={15} color={hoveredNavKey === `launched-${app.id}` ? 'var(--accent-launch)' : 'var(--text-secondary)'} />
+                          <IconComponent size={15} color={hoveredNavKey === `launched-${app.id}` ? 'var(--accent-pipelines)' : 'var(--text-secondary)'} />
                         )}
                       </LeftPaneNavIcon>
                     </button>
@@ -899,7 +899,7 @@ export function LeftPanel({
               >
                 <LeftPaneNavIcon
                   icon={Icon}
-                  iconColor={hoveredNavKey === type ? color : 'var(--text-secondary)'}
+                  iconColor={hoveredNavKey === type ? 'var(--accent-pipelines)' : 'var(--text-secondary)'}
                 />
               </button>
             ))}
