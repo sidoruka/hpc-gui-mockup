@@ -29,6 +29,7 @@ import { VSCodeIcon } from './icons/VSCodeIcon';
 import { LaunchDialog } from './LaunchDialog';
 import { LeftPaneNavIcon } from './LeftPaneNavIcon';
 import { launchableAppIconMap } from './launchableAppIcons';
+import { runningPipelinesCount } from '../views/RunsView';
 
 interface NavItem {
   type: TabType;
@@ -607,9 +608,9 @@ export function LeftPanel({
             {sectionsExpanded.pipelines && (
             <>
             {[
-              { label: 'All pipelines', icon: Workflow, tabType: 'all-pipelines' as const, navKey: 'all-pipelines' as const },
-              { label: 'Runs', icon: List, tabType: 'runs' as const, navKey: 'runs' as const },
-            ].map(({ label, icon: Icon, tabType, navKey }) => (
+              { label: 'All pipelines', icon: Workflow, tabType: 'all-pipelines' as const, navKey: 'all-pipelines' as const, badge: null as number | null },
+              { label: 'Runs', icon: List, tabType: 'runs' as const, navKey: 'runs' as const, badge: runningPipelinesCount > 0 ? runningPipelinesCount : null },
+            ].map(({ label, icon: Icon, tabType, navKey, badge }) => (
               <button
                 key={label}
                 type="button"
@@ -635,7 +636,27 @@ export function LeftPanel({
                   icon={Icon}
                   iconColor={hoveredNavKey === navKey ? 'var(--accent-pipelines)' : 'var(--text-secondary)'}
                 />
-                {label}
+                <span style={{ flex: 1, minWidth: 0 }}>{label}</span>
+                {badge != null && (
+                  <span
+                    style={{
+                      flexShrink: 0,
+                      minWidth: '18px',
+                      height: '18px',
+                      padding: '0 5px',
+                      borderRadius: '9px',
+                      background: 'var(--accent-pipelines)',
+                      color: '#fff',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {badge}
+                  </span>
+                )}
               </button>
             ))}
             </>

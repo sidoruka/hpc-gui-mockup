@@ -24,6 +24,9 @@ const MOCK_RUNNING: PipelineRun[] = [
   },
 ];
 
+/** Number of currently running pipelines; used e.g. for the left-pane "Runs" badge. */
+export const runningPipelinesCount = MOCK_RUNNING.length;
+
 const MOCK_HISTORY: PipelineRun[] = [
   {
     id: 'run-601165',
