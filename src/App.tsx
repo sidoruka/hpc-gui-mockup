@@ -20,8 +20,23 @@ const MIN_SIDEBAR_WIDTH = 180;
 const MAX_SIDEBAR_WIDTH = 480;
 const DEFAULT_SIDEBAR_WIDTH = 240;
 
+export type Theme = 'dark' | 'light';
+
+const THEME_STORAGE_KEY = 'hpc-mockups-theme';
+
+function getInitialTheme(): Theme {
+  try {
+    const stored = localStorage.getItem(THEME_STORAGE_KEY);
+    if (stored === 'light' || stored === 'dark') return stored;
+  } catch {
+    /* ignore */
+  }
+  return 'dark';
+}
+
 function App() {
   const [state, dispatch] = useReducer(appReducer, initialState);
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
   const [rightPanelWidth, setRightPanelWidth] = useState(FILE_EXPLORER_DEFAULT_WIDTH);
   const [isResizing, setIsResizing] = useState(false);
@@ -29,6 +44,15 @@ function App() {
   const resizeStartX = useRef(0);
   const resizeStartWidth = useRef(0);
   const launchReadyTimeouts = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch {
+      /* ignore */
+    }
+  }, [theme]);
 
   useEffect(() => {
     return () => {
@@ -126,6 +150,8 @@ function App() {
         launchedApps={state.launchedApps}
         onLaunchApp={launchApp}
         onStopLaunchedApp={stopLaunchedApp}
+        theme={theme}
+        onThemeChange={setTheme}
       />
       {!state.sidebarCollapsed && (
         <div

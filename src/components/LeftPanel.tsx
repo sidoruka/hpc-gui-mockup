@@ -17,6 +17,7 @@ import {
   MoreVertical,
   Info,
   Star,
+  Check,
 } from 'lucide-react';
 import type { TabType, LaunchedApp } from '../state/appState';
 import { getTitleForType } from '../state/appState';
@@ -27,6 +28,7 @@ import { LaunchDialog } from './LaunchDialog';
 import { LeftPaneNavIcon } from './LeftPaneNavIcon';
 import { launchableAppIconMap } from './launchableAppIcons';
 import { runningPipelinesCount } from '../views/RunsView';
+import type { Theme } from '../App';
 
 interface NavItem {
   type: TabType;
@@ -53,6 +55,8 @@ interface LeftPanelProps {
   launchedApps: LaunchedApp[];
   onLaunchApp: (catalogAppId: string) => void;
   onStopLaunchedApp: (launchedAppId: string) => void;
+  theme: Theme;
+  onThemeChange: (theme: Theme) => void;
 }
 
 const EXPANDED_DEFAULT_WIDTH = 240;
@@ -83,11 +87,14 @@ export function LeftPanel({
   launchedApps,
   onLaunchApp,
   onStopLaunchedApp,
+  theme,
+  onThemeChange,
 }: LeftPanelProps) {
   const [launchDialogOpen, setLaunchDialogOpen] = useState(false);
   const [stopConfirmApp, setStopConfirmApp] = useState<LaunchedApp | null>(null);
   const [openMenuAppId, setOpenMenuAppId] = useState<string | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [appearanceSubmenuOpen, setAppearanceSubmenuOpen] = useState(false);
   const menuContainerRef = useRef<HTMLDivElement | null>(null);
   const userMenuRef = useRef<HTMLDivElement | null>(null);
 
@@ -100,6 +107,7 @@ export function LeftPanel({
       }
       if (userMenuOpen && userMenuRef.current && !userMenuRef.current.contains(target)) {
         setUserMenuOpen(false);
+        setAppearanceSubmenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -728,33 +736,147 @@ export function LeftPanel({
                     zIndex: 100,
                   }}
                 >
-                  {['Profile', 'Appearance', 'Usage statistics'].map((label) => (
-                    <button
-                      key={label}
-                      type="button"
-                      onClick={() => setUserMenuOpen(false)}
-                      style={{
-                        width: '100%',
-                        padding: '8px 12px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        background: 'transparent',
-                        border: 'none',
-                        color: 'var(--text-primary)',
-                        cursor: 'pointer',
-                        fontSize: '13px',
-                        textAlign: 'left',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'var(--bg-hover)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'transparent';
-                      }}
-                    >
-                      {label}
-                    </button>
-                  ))}
+                  {appearanceSubmenuOpen ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setAppearanceSubmenuOpen(false)}
+                        style={{
+                          width: '100%',
+                          padding: '8px 12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          background: 'transparent',
+                          border: 'none',
+                          color: 'var(--text-primary)',
+                          cursor: 'pointer',
+                          fontSize: '13px',
+                          textAlign: 'left',
+                          borderBottom: '1px solid var(--border-subtle)',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'var(--bg-hover)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'transparent';
+                        }}
+                      >
+                        <ChevronRight size={14} style={{ transform: 'rotate(180deg)' }} />
+                        Appearance
+                      </button>
+                      {(['dark', 'light'] as const).map((t) => (
+                        <button
+                          key={t}
+                          type="button"
+                          onClick={() => {
+                            onThemeChange(t);
+                            setAppearanceSubmenuOpen(false);
+                            setUserMenuOpen(false);
+                          }}
+                          style={{
+                            width: '100%',
+                            padding: '8px 12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            background: 'transparent',
+                            border: 'none',
+                            color: 'var(--text-primary)',
+                            cursor: 'pointer',
+                            fontSize: '13px',
+                            textAlign: 'left',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'var(--bg-hover)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'transparent';
+                          }}
+                        >
+                          {theme === t ? <Check size={14} style={{ flexShrink: 0 }} /> : <span style={{ width: 14, flexShrink: 0 }} />}
+                          {t === 'dark' ? 'Dark' : 'Light'}
+                        </button>
+                      ))}
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setUserMenuOpen(false)}
+                        style={{
+                          width: '100%',
+                          padding: '8px 12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          background: 'transparent',
+                          border: 'none',
+                          color: 'var(--text-primary)',
+                          cursor: 'pointer',
+                          fontSize: '13px',
+                          textAlign: 'left',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'var(--bg-hover)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'transparent';
+                        }}
+                      >
+                        Profile
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setAppearanceSubmenuOpen(true)}
+                        style={{
+                          width: '100%',
+                          padding: '8px 12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          background: 'transparent',
+                          border: 'none',
+                          color: 'var(--text-primary)',
+                          cursor: 'pointer',
+                          fontSize: '13px',
+                          textAlign: 'left',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'var(--bg-hover)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'transparent';
+                        }}
+                      >
+                        Appearance
+                        <ChevronRight size={14} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setUserMenuOpen(false)}
+                        style={{
+                          width: '100%',
+                          padding: '8px 12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          background: 'transparent',
+                          border: 'none',
+                          color: 'var(--text-primary)',
+                          cursor: 'pointer',
+                          fontSize: '13px',
+                          textAlign: 'left',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'var(--bg-hover)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'transparent';
+                        }}
+                      >
+                        Usage statistics
+                      </button>
+                    </>
+                  )}
                 </div>
               )}
             </div>
@@ -959,33 +1081,147 @@ export function LeftPanel({
                     zIndex: 100,
                   }}
                 >
-                  {['Profile', 'Appearance', 'Usage statistics'].map((label) => (
-                    <button
-                      key={label}
-                      type="button"
-                      onClick={() => setUserMenuOpen(false)}
-                      style={{
-                        width: '100%',
-                        padding: '8px 12px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        background: 'transparent',
-                        border: 'none',
-                        color: 'var(--text-primary)',
-                        cursor: 'pointer',
-                        fontSize: '13px',
-                        textAlign: 'left',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'var(--bg-hover)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'transparent';
-                      }}
-                    >
-                      {label}
-                    </button>
-                  ))}
+                  {appearanceSubmenuOpen ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setAppearanceSubmenuOpen(false)}
+                        style={{
+                          width: '100%',
+                          padding: '8px 12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          background: 'transparent',
+                          border: 'none',
+                          color: 'var(--text-primary)',
+                          cursor: 'pointer',
+                          fontSize: '13px',
+                          textAlign: 'left',
+                          borderBottom: '1px solid var(--border-subtle)',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'var(--bg-hover)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'transparent';
+                        }}
+                      >
+                        <ChevronRight size={14} style={{ transform: 'rotate(180deg)' }} />
+                        Appearance
+                      </button>
+                      {(['dark', 'light'] as const).map((t) => (
+                        <button
+                          key={t}
+                          type="button"
+                          onClick={() => {
+                            onThemeChange(t);
+                            setAppearanceSubmenuOpen(false);
+                            setUserMenuOpen(false);
+                          }}
+                          style={{
+                            width: '100%',
+                            padding: '8px 12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            background: 'transparent',
+                            border: 'none',
+                            color: 'var(--text-primary)',
+                            cursor: 'pointer',
+                            fontSize: '13px',
+                            textAlign: 'left',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'var(--bg-hover)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'transparent';
+                          }}
+                        >
+                          {theme === t ? <Check size={14} style={{ flexShrink: 0 }} /> : <span style={{ width: 14, flexShrink: 0 }} />}
+                          {t === 'dark' ? 'Dark' : 'Light'}
+                        </button>
+                      ))}
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setUserMenuOpen(false)}
+                        style={{
+                          width: '100%',
+                          padding: '8px 12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          background: 'transparent',
+                          border: 'none',
+                          color: 'var(--text-primary)',
+                          cursor: 'pointer',
+                          fontSize: '13px',
+                          textAlign: 'left',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'var(--bg-hover)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'transparent';
+                        }}
+                      >
+                        Profile
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setAppearanceSubmenuOpen(true)}
+                        style={{
+                          width: '100%',
+                          padding: '8px 12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          background: 'transparent',
+                          border: 'none',
+                          color: 'var(--text-primary)',
+                          cursor: 'pointer',
+                          fontSize: '13px',
+                          textAlign: 'left',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'var(--bg-hover)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'transparent';
+                        }}
+                      >
+                        Appearance
+                        <ChevronRight size={14} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setUserMenuOpen(false)}
+                        style={{
+                          width: '100%',
+                          padding: '8px 12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          background: 'transparent',
+                          border: 'none',
+                          color: 'var(--text-primary)',
+                          cursor: 'pointer',
+                          fontSize: '13px',
+                          textAlign: 'left',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'var(--bg-hover)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'transparent';
+                        }}
+                      >
+                        Usage statistics
+                      </button>
+                    </>
+                  )}
                 </div>
               )}
             </div>

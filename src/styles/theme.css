@@ -1,4 +1,5 @@
-:root {
+:root,
+[data-theme="dark"] {
   --bg-main: #1e1e1e;
   --bg-sidebar: #252526;
   --bg-search: #2c2c2c;
@@ -22,6 +23,32 @@
   --run-status-stopped: #ea580c;
   --run-status-failure: #dc2626;
   --run-status-running: #0ea5e9;
+}
+
+[data-theme="light"] {
+  --bg-main: #f3f3f3;
+  --bg-sidebar: #f0f0f0;
+  --bg-search: #e8e8e8;
+  --bg-hover: #e5e5e5;
+  --bg-active: #d4d4d4;
+  --text-primary: #1a1a1a;
+  --text-secondary: #4a4a4a;
+  --border-subtle: #d1d1d1;
+  --accent-shell: #006cbd;
+  --accent-desktop: #5c2d91;
+  --accent-jupyter: #e56a1a;
+  --accent-rstudio: #1a5fb4;
+  --accent-vscode: #0066b8;
+  --accent-files: #0d6b0d;
+  --accent-shared: #0099a8;
+  --accent-common: #6b4c9a;
+  --accent-chat: #6b23a8;
+  --accent-launch: #0b7d74;
+  --accent-pipelines: #0284c7;
+  --run-status-success: #15803d;
+  --run-status-stopped: #c2410c;
+  --run-status-failure: #b91c1c;
+  --run-status-running: #0284c7;
 }
 
 @keyframes spin {
