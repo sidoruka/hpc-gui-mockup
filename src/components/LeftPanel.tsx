@@ -68,7 +68,7 @@ const navButtonStyle = {
   display: 'flex' as const,
   alignItems: 'center' as const,
   gap: '12px',
-  padding: '10px 12px',
+  padding: '6px 12px',
   background: 'transparent',
   border: 'none',
   color: 'var(--text-primary)',
@@ -201,8 +201,8 @@ export function LeftPanel({
         <>
           <div
             style={{
-              padding: '8px 12px',
-              margin: '8px 12px 0',
+              padding: '6px 12px',
+              margin: '4px 12px 0',
               background: 'var(--bg-search)',
               borderRadius: '20px',
               display: 'flex',
@@ -210,7 +210,7 @@ export function LeftPanel({
               gap: '8px',
             }}
           >
-            <Search size={16} color="var(--text-secondary)" />
+            <Search size={12} color="var(--text-secondary)" />
             <input
               type="text"
               placeholder="Search"
@@ -224,7 +224,7 @@ export function LeftPanel({
               }}
             />
           </div>
-          <nav style={{ flex: 1, overflow: 'auto', padding: '8px 0' }}>
+          <nav style={{ flex: 1, overflow: 'auto', padding: '4px 0' }}>
             <button
               type="button"
               onClick={() => onOpenApp(chatItem.type)}
@@ -233,7 +233,7 @@ export function LeftPanel({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px',
-                padding: '10px 12px',
+                padding: '6px 12px',
                 background: 'transparent',
                 border: 'none',
                 color: 'var(--text-primary)',
@@ -254,13 +254,13 @@ export function LeftPanel({
                   flexShrink: 0,
                 }}
               >
-                <MessageCircle size={16} color="#fff" />
+                <MessageCircle size={12} color="#fff" />
               </div>
               {getTitleForType(chatItem.type)}
             </button>
             <div
               style={{
-                padding: '8px 12px',
+                padding: '4px 12px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
@@ -283,11 +283,11 @@ export function LeftPanel({
                 }}
               >
                 {sectionsExpanded.apps ? (
-                  <ChevronDown size={16} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
+                  <ChevronDown size={12} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
                 ) : (
-                  <ChevronRight size={16} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
+                  <ChevronRight size={12} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
                 )}
-                <LayoutGrid size={18} color="var(--text-secondary)" />
+                <LayoutGrid size={14} color="var(--text-secondary)" />
                 <span style={{ fontWeight: 600, fontSize: '13px' }}>
                   Apps ({appsGroup.length + launchedApps.length})
                 </span>
@@ -316,7 +316,7 @@ export function LeftPanel({
                   e.currentTarget.style.color = 'var(--text-secondary)';
                 }}
               >
-                <Plus size={18} />
+                <Plus size={14} />
               </button>
             </div>
             {sectionsExpanded.apps && (
@@ -341,11 +341,11 @@ export function LeftPanel({
                   }}
                 >
                   {type === 'rstudio' ? (
-                    <RStudioIcon size={16} color="#fff" circleColor={color} />
+                    <RStudioIcon size={12} color="#fff" circleColor={color} />
                   ) : type === 'vscode' ? (
-                    <VSCodeIcon size={20} />
+                    <VSCodeIcon size={15} />
                   ) : (
-                    <Icon size={16} color="#fff" />
+                    <Icon size={12} color="#fff" />
                   )}
                 </div>
                 {getTitleForType(type)}
@@ -355,9 +355,9 @@ export function LeftPanel({
               <>
                 <div
                   style={{
-                    margin: '8px 12px 4px',
+                    margin: '4px 12px 2px',
                     borderTop: '1px solid var(--border-subtle)',
-                    paddingTop: '8px',
+                    paddingTop: '4px',
                   }}
                 />
                 {launchedApps.map((app) => {
@@ -399,9 +399,9 @@ export function LeftPanel({
                           }}
                         >
                           {isLaunching ? (
-                            <Loader2 size={16} color="#fff" style={{ animation: 'spin 1s linear infinite' }} />
+                            <Loader2 size={12} color="#fff" style={{ animation: 'spin 1s linear infinite' }} />
                           ) : (
-                            <IconComponent size={16} color="#fff" />
+                            <IconComponent size={12} color="#fff" />
                           )}
                         </div>
                         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -434,7 +434,7 @@ export function LeftPanel({
                             e.currentTarget.style.color = 'var(--text-secondary)';
                           }}
                         >
-                          <Square size={14} fill="currentColor" />
+                          <Square size={11} fill="currentColor" />
                         </button>
                       )}
                     </div>
@@ -449,7 +449,7 @@ export function LeftPanel({
               onClick={() => toggleSection('pipelines')}
               style={{
                 width: '100%',
-                padding: '16px 12px 8px',
+                padding: '10px 12px 4px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
@@ -461,11 +461,11 @@ export function LeftPanel({
               }}
             >
               {sectionsExpanded.pipelines ? (
-                <ChevronDown size={16} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
+                <ChevronDown size={12} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
               ) : (
-                <ChevronRight size={16} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
+                <ChevronRight size={12} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
               )}
-              <Workflow size={18} color="var(--text-secondary)" />
+              <Workflow size={14} color="var(--text-secondary)" />
               <span style={{ fontWeight: 600, fontSize: '13px' }}>Pipelines</span>
             </button>
             {sectionsExpanded.pipelines && (
@@ -483,7 +483,7 @@ export function LeftPanel({
                   display: 'flex',
                   alignItems: 'center',
                   gap: '12px',
-                  padding: '10px 12px',
+                  padding: '6px 12px',
                   background: 'transparent',
                   border: 'none',
                   color: 'var(--text-primary)',
@@ -504,7 +504,7 @@ export function LeftPanel({
                     flexShrink: 0,
                   }}
                 >
-                  <Icon size={16} color="#fff" />
+                  <Icon size={12} color="#fff" />
                 </div>
                 {label}
               </button>
@@ -516,7 +516,7 @@ export function LeftPanel({
               onClick={() => toggleSection('data')}
               style={{
                 width: '100%',
-                padding: '16px 12px 8px',
+                padding: '10px 12px 4px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
@@ -528,11 +528,11 @@ export function LeftPanel({
               }}
             >
               {sectionsExpanded.data ? (
-                <ChevronDown size={16} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
+                <ChevronDown size={12} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
               ) : (
-                <ChevronRight size={16} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
+                <ChevronRight size={12} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
               )}
-              <Folder size={18} color="var(--text-secondary)" />
+              <Folder size={14} color="var(--text-secondary)" />
               <span style={{ fontWeight: 600, fontSize: '13px' }}>Data</span>
             </button>
             {sectionsExpanded.data && (
@@ -547,7 +547,7 @@ export function LeftPanel({
                   display: 'flex',
                   alignItems: 'center',
                   gap: '12px',
-                  padding: '10px 12px',
+                  padding: '6px 12px',
                   background: 'transparent',
                   border: 'none',
                   color: 'var(--text-primary)',
@@ -568,7 +568,7 @@ export function LeftPanel({
                     flexShrink: 0,
                   }}
                 >
-                  <Icon size={16} color="#fff" />
+                  <Icon size={12} color="#fff" />
                 </div>
                 {getTitleForType(type)}
               </button>
@@ -578,7 +578,7 @@ export function LeftPanel({
           </nav>
           <div
             style={{
-              padding: '12px',
+              padding: '8px',
               borderTop: '1px solid var(--border-subtle)',
               display: 'flex',
               alignItems: 'center',
@@ -597,7 +597,7 @@ export function LeftPanel({
                 flexShrink: 0,
               }}
             >
-              <User size={18} color="var(--text-secondary)" />
+              <User size={14} color="var(--text-secondary)" />
             </div>
             <span style={{ flex: 1, fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               User
@@ -614,14 +614,14 @@ export function LeftPanel({
               }}
               title="Collapse panel"
             >
-              <PanelLeftClose size={18} />
+              <PanelLeftClose size={14} />
             </button>
           </div>
         </>
       )}
       {collapsed && (
         <>
-          <nav style={{ flex: 1, overflow: 'auto', padding: '8px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+          <nav style={{ flex: 1, overflow: 'auto', padding: '4px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
             <button
               type="button"
               onClick={() => onOpenApp(chatItem.type)}
@@ -650,7 +650,7 @@ export function LeftPanel({
                   justifyContent: 'center',
                 }}
               >
-                <MessageCircle size={16} color="#fff" />
+                <MessageCircle size={12} color="#fff" />
               </div>
             </button>
             <button
@@ -671,7 +671,7 @@ export function LeftPanel({
                 color: 'var(--text-secondary)',
               }}
             >
-              <Plus size={20} />
+              <Plus size={15} />
             </button>
             {appsGroup.map(({ type, icon: Icon, color }) => (
               <button
@@ -704,11 +704,11 @@ export function LeftPanel({
                   }}
                 >
                   {type === 'rstudio' ? (
-                    <RStudioIcon size={16} color="#fff" circleColor={color} />
+                    <RStudioIcon size={12} color="#fff" circleColor={color} />
                   ) : type === 'vscode' ? (
-                    <VSCodeIcon size={20} />
+                    <VSCodeIcon size={15} />
                   ) : (
-                    <Icon size={16} color="#fff" />
+                    <Icon size={12} color="#fff" />
                   )}
                 </div>
               </button>
@@ -720,7 +720,7 @@ export function LeftPanel({
                     width: 24,
                     height: 1,
                     background: 'var(--border-subtle)',
-                    margin: '6px 0',
+                    margin: '4px 0',
                     flexShrink: 0,
                   }}
                 />
@@ -761,9 +761,9 @@ export function LeftPanel({
                         }}
                       >
                         {isLaunching ? (
-                          <Loader2 size={16} color="#fff" style={{ animation: 'spin 1s linear infinite' }} />
+                          <Loader2 size={12} color="#fff" style={{ animation: 'spin 1s linear infinite' }} />
                         ) : (
-                          <IconComponent size={16} color="#fff" />
+                          <IconComponent size={12} color="#fff" />
                         )}
                       </div>
                     </button>
@@ -801,14 +801,14 @@ export function LeftPanel({
                     justifyContent: 'center',
                   }}
                 >
-                  <Icon size={16} color="#fff" />
+                  <Icon size={12} color="#fff" />
                 </div>
               </button>
             ))}
           </nav>
           <div
             style={{
-              padding: '12px',
+              padding: '8px',
               borderTop: '1px solid var(--border-subtle)',
               display: 'flex',
               flexDirection: 'column',
@@ -827,7 +827,7 @@ export function LeftPanel({
                 justifyContent: 'center',
               }}
             >
-              <User size={18} color="var(--text-secondary)" />
+              <User size={14} color="var(--text-secondary)" />
             </div>
             <button
               type="button"
@@ -841,7 +841,7 @@ export function LeftPanel({
               }}
               title="Expand panel"
             >
-              <PanelLeftOpen size={18} />
+              <PanelLeftOpen size={14} />
             </button>
           </div>
         </>
