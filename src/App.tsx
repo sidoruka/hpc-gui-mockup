@@ -1,4 +1,5 @@
 import { useReducer, useCallback, useRef, useEffect, useState } from 'react';
+import { X } from 'lucide-react';
 import { LeftPanel } from './components/LeftPanel';
 import { RightPane } from './components/RightPane';
 import {
@@ -7,6 +8,7 @@ import {
   FILE_EXPLORER_MIN_WIDTH,
   FILE_EXPLORER_MAX_WIDTH,
 } from './components/FileExplorerPanel';
+import { ChatView } from './views/ChatView';
 import {
   appReducer,
   initialState,
@@ -16,6 +18,10 @@ import {
   type Tab,
 } from './state/appState';
 import './styles/theme.css';
+
+const CHAT_PANEL_MIN_WIDTH = 320;
+const CHAT_PANEL_DEFAULT_WIDTH = 400;
+const CHAT_PANEL_MAX_WIDTH = 800;
 
 const MIN_SIDEBAR_WIDTH = 180;
 const MAX_SIDEBAR_WIDTH = 480;
@@ -44,6 +50,8 @@ function App() {
   const [rightPanelWidth, setRightPanelWidth] = useState(FILE_EXPLORER_DEFAULT_WIDTH);
   const [isResizing, setIsResizing] = useState(false);
   const [isResizingRight, setIsResizingRight] = useState(false);
+  const [chatPanelWidth, setChatPanelWidth] = useState(CHAT_PANEL_DEFAULT_WIDTH);
+  const [isResizingChat, setIsResizingChat] = useState(false);
   const resizeStartX = useRef(0);
   const resizeStartWidth = useRef(0);
   const launchReadyTimeouts = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -157,6 +165,40 @@ function App() {
     };
   }, [isResizingRight]);
 
+  const handleChatResizeStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizingChat(true);
+    resizeStartX.current = e.clientX;
+    resizeStartWidth.current = chatPanelWidth;
+  }, [chatPanelWidth]);
+
+  useEffect(() => {
+    if (!isResizingChat) return;
+    const handleMove = (e: MouseEvent) => {
+      const delta = e.clientX - resizeStartX.current;
+      const next = Math.min(
+        CHAT_PANEL_MAX_WIDTH,
+        Math.max(CHAT_PANEL_MIN_WIDTH, resizeStartWidth.current + delta)
+      );
+      setChatPanelWidth(next);
+    };
+    const handleUp = () => setIsResizingChat(false);
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('mouseup', handleUp);
+    return () => {
+      document.removeEventListener('mousemove', handleMove);
+      document.removeEventListener('mouseup', handleUp);
+    };
+  }, [isResizingChat]);
+
+  const chatTab = state.openTabs.find((t) => t.type === 'chat');
+  const otherTabs = state.openTabs.filter((t) => t.type !== 'chat');
+  const isChatWithOthers = Boolean(chatTab && otherTabs.length > 0);
+  const rightPaneActiveId =
+    isChatWithOthers && state.activeTabId && otherTabs.some((t) => t.id === state.activeTabId)
+      ? state.activeTabId
+      : otherTabs[0]?.id ?? null;
+
   return (
     <div
       style={{
@@ -194,18 +236,98 @@ function App() {
           title="Drag to resize"
         />
       )}
-      <RightPane
-        openTabs={state.openTabs}
-        activeTabId={state.activeTabId}
-        launchedApps={state.launchedApps}
-        onSelectTab={(id) => dispatch({ type: 'SET_ACTIVE_TAB', tabId: id })}
-        onCloseTab={(id) => dispatch({ type: 'CLOSE_TAB', tabId: id })}
-        onOpenInNewWindow={handleOpenInNewWindow}
-        onCloseAllTabs={() => dispatch({ type: 'CLOSE_ALL_TABS' })}
-        onCloseOtherTabs={(keepTabId) => dispatch({ type: 'CLOSE_OTHER_TABS', keepTabId })}
-        onReorderTabs={(from, to) => dispatch({ type: 'REORDER_TABS', fromIndex: from, toIndex: to })}
-        onOpenChat={() => openApp('chat')}
-      />
+      {isChatWithOthers ? (
+        <>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              width: chatPanelWidth,
+              minWidth: chatPanelWidth,
+              flexShrink: 0,
+              height: '100%',
+              borderRight: '1px solid var(--border-subtle)',
+              background: 'var(--bg-main)',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '8px 12px',
+                borderBottom: '1px solid var(--border-subtle)',
+                flexShrink: 0,
+              }}
+            >
+              <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-secondary)' }}>
+                Chat
+              </span>
+              <button
+                type="button"
+                onClick={() => chatTab && dispatch({ type: 'CLOSE_TAB', tabId: chatTab.id })}
+                style={{
+                  padding: 4,
+                  border: 'none',
+                  background: 'transparent',
+                  borderRadius: 4,
+                  cursor: 'pointer',
+                  color: 'var(--text-secondary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                title="Close chat"
+                aria-label="Close chat"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
+              <ChatView />
+            </div>
+          </div>
+          <div
+            role="separator"
+            onMouseDown={handleChatResizeStart}
+            style={{
+              width: 6,
+              minWidth: 6,
+              flexShrink: 0,
+              background: isResizingChat ? 'var(--accent-shell)' : 'transparent',
+              cursor: 'col-resize',
+              borderLeft: '1px solid var(--border-subtle)',
+              borderRight: '1px solid var(--border-subtle)',
+            }}
+            title="Drag to resize"
+          />
+          <RightPane
+            openTabs={otherTabs}
+            activeTabId={rightPaneActiveId}
+            launchedApps={state.launchedApps}
+            onSelectTab={(id) => dispatch({ type: 'SET_ACTIVE_TAB', tabId: id })}
+            onCloseTab={(id) => dispatch({ type: 'CLOSE_TAB', tabId: id })}
+            onOpenInNewWindow={handleOpenInNewWindow}
+            onCloseAllTabs={() => dispatch({ type: 'CLOSE_ALL_TABS' })}
+            onCloseOtherTabs={(keepTabId) => dispatch({ type: 'CLOSE_OTHER_TABS', keepTabId })}
+            onReorderTabs={(from, to) => dispatch({ type: 'REORDER_TABS', fromIndex: from, toIndex: to })}
+            onOpenChat={() => openApp('chat')}
+          />
+        </>
+      ) : (
+        <RightPane
+          openTabs={state.openTabs}
+          activeTabId={state.activeTabId}
+          launchedApps={state.launchedApps}
+          onSelectTab={(id) => dispatch({ type: 'SET_ACTIVE_TAB', tabId: id })}
+          onCloseTab={(id) => dispatch({ type: 'CLOSE_TAB', tabId: id })}
+          onOpenInNewWindow={handleOpenInNewWindow}
+          onCloseAllTabs={() => dispatch({ type: 'CLOSE_ALL_TABS' })}
+          onCloseOtherTabs={(keepTabId) => dispatch({ type: 'CLOSE_OTHER_TABS', keepTabId })}
+          onReorderTabs={(from, to) => dispatch({ type: 'REORDER_TABS', fromIndex: from, toIndex: to })}
+          onOpenChat={() => openApp('chat')}
+        />
+      )}
       {!state.rightSidebarCollapsed && (
         <div
           role="separator"
