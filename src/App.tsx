@@ -19,9 +19,10 @@ import {
 } from './state/appState';
 import './styles/theme.css';
 
+const CHAT_PANEL_DEFAULT_RATIO = 0.25; // 25% chat, 75% other tabs
+const CHAT_PANEL_MIN_RATIO = 0.15;
+const CHAT_PANEL_MAX_RATIO = 0.5;
 const CHAT_PANEL_MIN_WIDTH = 320;
-const CHAT_PANEL_DEFAULT_WIDTH = 400;
-const CHAT_PANEL_MAX_WIDTH = 800;
 
 const MIN_SIDEBAR_WIDTH = 180;
 const MAX_SIDEBAR_WIDTH = 480;
@@ -50,8 +51,9 @@ function App() {
   const [rightPanelWidth, setRightPanelWidth] = useState(FILE_EXPLORER_DEFAULT_WIDTH);
   const [isResizing, setIsResizing] = useState(false);
   const [isResizingRight, setIsResizingRight] = useState(false);
-  const [chatPanelWidth, setChatPanelWidth] = useState(CHAT_PANEL_DEFAULT_WIDTH);
+  const [chatPanelRatio, setChatPanelRatio] = useState(CHAT_PANEL_DEFAULT_RATIO);
   const [isResizingChat, setIsResizingChat] = useState(false);
+  const mainContentRef = useRef<HTMLDivElement>(null);
   const resizeStartX = useRef(0);
   const resizeStartWidth = useRef(0);
   const launchReadyTimeouts = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -167,20 +169,25 @@ function App() {
 
   const handleChatResizeStart = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
+    const el = mainContentRef.current;
+    if (el) resizeStartWidth.current = el.clientWidth * chatPanelRatio;
     setIsResizingChat(true);
     resizeStartX.current = e.clientX;
-    resizeStartWidth.current = chatPanelWidth;
-  }, [chatPanelWidth]);
+  }, [chatPanelRatio]);
 
   useEffect(() => {
     if (!isResizingChat) return;
     const handleMove = (e: MouseEvent) => {
+      const el = mainContentRef.current;
+      if (!el) return;
       const delta = e.clientX - resizeStartX.current;
-      const next = Math.min(
-        CHAT_PANEL_MAX_WIDTH,
-        Math.max(CHAT_PANEL_MIN_WIDTH, resizeStartWidth.current + delta)
+      const containerWidth = el.clientWidth;
+      const newPixelWidth = resizeStartWidth.current + delta;
+      const newRatio = Math.min(
+        CHAT_PANEL_MAX_RATIO,
+        Math.max(CHAT_PANEL_MIN_RATIO, containerWidth ? newPixelWidth / containerWidth : chatPanelRatio)
       );
-      setChatPanelWidth(next);
+      setChatPanelRatio(newRatio);
     };
     const handleUp = () => setIsResizingChat(false);
     document.addEventListener('mousemove', handleMove);
@@ -189,7 +196,7 @@ function App() {
       document.removeEventListener('mousemove', handleMove);
       document.removeEventListener('mouseup', handleUp);
     };
-  }, [isResizingChat]);
+  }, [isResizingChat, chatPanelRatio]);
 
   const chatTab = state.openTabs.find((t) => t.type === 'chat');
   const otherTabs = state.openTabs.filter((t) => t.type !== 'chat');
@@ -237,13 +244,21 @@ function App() {
         />
       )}
       {isChatWithOthers ? (
-        <>
+        <div
+          ref={mainContentRef}
+          style={{
+            flex: 1,
+            display: 'flex',
+            minWidth: 0,
+            height: '100%',
+          }}
+        >
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
-              width: chatPanelWidth,
-              minWidth: chatPanelWidth,
+              width: `${chatPanelRatio * 100}%`,
+              minWidth: CHAT_PANEL_MIN_WIDTH,
               flexShrink: 0,
               height: '100%',
               borderRight: '1px solid var(--border-subtle)',
@@ -313,7 +328,7 @@ function App() {
             onReorderTabs={(from, to) => dispatch({ type: 'REORDER_TABS', fromIndex: from, toIndex: to })}
             onOpenChat={() => openApp('chat')}
           />
-        </>
+        </div>
       ) : (
         <RightPane
           openTabs={state.openTabs}

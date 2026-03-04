@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Send, Search } from 'lucide-react';
+import { Send } from 'lucide-react';
 
 const placeholderMessages = [
   { role: 'assistant' as const, text: 'I can help you search and analyze your data on the HPC. Try asking about your files, datasets, or request an analysis.' },
@@ -17,20 +17,6 @@ export function ChatView() {
         background: 'var(--bg-main)',
       }}
     >
-      <div
-        style={{
-          padding: '12px 16px',
-          borderBottom: '1px solid var(--border-subtle)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-        }}
-      >
-        <Search size={18} color="var(--accent-chat)" />
-        <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
-          Chat — search and analyze your data
-        </span>
-      </div>
       <div
         style={{
           flex: 1,
