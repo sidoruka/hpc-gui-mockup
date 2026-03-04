@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, X, Terminal, Monitor, Layers } from 'lucide-react';
+import { Search, X, Terminal, Monitor, Layers, Plus } from 'lucide-react';
 import { getLaunchableAppsCatalog } from '../state/appState';
 import { launchableAppIconMap } from './launchableAppIcons';
 
@@ -28,9 +28,10 @@ const dialogStyle: React.CSSProperties = {
 interface LaunchDialogProps {
   onClose: () => void;
   onLaunch: (catalogAppId: string) => void;
+  onBuildNewApp?: () => void;
 }
 
-export function LaunchDialog({ onClose, onLaunch }: LaunchDialogProps) {
+export function LaunchDialog({ onClose, onLaunch, onBuildNewApp }: LaunchDialogProps) {
   const [query, setQuery] = useState('');
   const catalog = useMemo(() => getLaunchableAppsCatalog(), []);
   const filtered = useMemo(() => {
@@ -114,6 +115,45 @@ export function LaunchDialog({ onClose, onLaunch }: LaunchDialogProps) {
             />
           </div>
         </div>
+        {onBuildNewApp && (
+          <div style={{ padding: '0 20px 12px', marginTop: '12px' }}>
+            <button
+              type="button"
+              onClick={() => {
+                onBuildNewApp();
+                onClose();
+              }}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                padding: '10px 16px',
+                background: 'transparent',
+                border: '1px dashed var(--border-subtle)',
+                borderRadius: '8px',
+                color: 'var(--text-secondary)',
+                fontSize: '14px',
+                fontWeight: 500,
+                cursor: 'pointer',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'var(--bg-hover)';
+                e.currentTarget.style.borderColor = 'var(--text-secondary)';
+                e.currentTarget.style.color = 'var(--text-primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                e.currentTarget.style.color = 'var(--text-secondary)';
+              }}
+            >
+              <Plus size={18} />
+              Build a new app
+            </button>
+          </div>
+        )}
         <div style={{ flex: 1, overflow: 'auto', padding: '8px 12px 16px' }}>
           {filtered.length === 0 ? (
             <p style={{ color: 'var(--text-secondary)', fontSize: '14px', padding: '24px 0', margin: 0 }}>

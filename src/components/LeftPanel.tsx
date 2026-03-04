@@ -163,6 +163,7 @@ export function LeftPanel({
             onLaunchApp(catalogAppId);
             setLaunchDialogOpen(false);
           }}
+          onBuildNewApp={() => setLaunchDialogOpen(false)}
         />
       )}
       {usageStatsOpen && (
