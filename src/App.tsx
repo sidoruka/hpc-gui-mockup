@@ -54,6 +54,7 @@ function App() {
   const [isResizingRight, setIsResizingRight] = useState(false);
   const [chatPanelRatio, setChatPanelRatio] = useState(CHAT_PANEL_DEFAULT_RATIO);
   const [isResizingChat, setIsResizingChat] = useState(false);
+  const [vscodeInjectedContent, setVscodeInjectedContent] = useState<string | null>(null);
   const mainContentRef = useRef<HTMLDivElement>(null);
   const resizeStartX = useRef(0);
   const resizeStartWidth = useRef(0);
@@ -315,7 +316,10 @@ function App() {
               </button>
             </div>
             <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
-              <ChatView startEmpty={chatTab?.chatStartEmpty} />
+              <ChatView
+                startEmpty={chatTab?.chatStartEmpty}
+                onSimulatedDockerfileRequest={(content) => setVscodeInjectedContent(content)}
+              />
             </div>
           </div>
           <div
@@ -343,6 +347,8 @@ function App() {
             onCloseOtherTabs={(keepTabId) => dispatch({ type: 'CLOSE_OTHER_TABS', keepTabId })}
             onReorderTabs={(from, to) => dispatch({ type: 'REORDER_TABS', fromIndex: from, toIndex: to })}
             onOpenChat={() => openApp('chat')}
+            vscodeInjectedContent={vscodeInjectedContent}
+            onVscodeInjectedContentConsumed={() => setVscodeInjectedContent(null)}
           />
         </div>
       ) : (
@@ -357,6 +363,8 @@ function App() {
           onCloseOtherTabs={(keepTabId) => dispatch({ type: 'CLOSE_OTHER_TABS', keepTabId })}
           onReorderTabs={(from, to) => dispatch({ type: 'REORDER_TABS', fromIndex: from, toIndex: to })}
           onOpenChat={() => openApp('chat')}
+          vscodeInjectedContent={vscodeInjectedContent}
+          onVscodeInjectedContentConsumed={() => setVscodeInjectedContent(null)}
         />
       )}
       {!state.rightSidebarCollapsed && (

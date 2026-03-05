@@ -14,9 +14,17 @@ interface TabContentProps {
   tabType: TabType;
   tab?: Tab;
   launchedApps?: LaunchedApp[];
+  vscodeInjectedContent?: string | null;
+  onVscodeInjectedContentConsumed?: () => void;
 }
 
-export function TabContent({ tabType, tab, launchedApps = [] }: TabContentProps) {
+export function TabContent({
+  tabType,
+  tab,
+  launchedApps = [],
+  vscodeInjectedContent,
+  onVscodeInjectedContentConsumed,
+}: TabContentProps) {
   if (tabType === 'launched' && tab?.launchedAppId) {
     const launched = launchedApps.find((a) => a.id === tab.launchedAppId);
     if (launched) {
@@ -36,7 +44,13 @@ export function TabContent({ tabType, tab, launchedApps = [] }: TabContentProps)
     case 'rstudio':
       return <RStudioView />;
     case 'vscode':
-      return <VSCodeView initialLanguage={tab?.type === 'vscode' ? tab.vscodeInitialLanguage : undefined} />;
+      return (
+        <VSCodeView
+          initialLanguage={tab?.type === 'vscode' ? tab.vscodeInitialLanguage : undefined}
+          injectedContent={vscodeInjectedContent ?? undefined}
+          onInjectedContentConsumed={onVscodeInjectedContentConsumed}
+        />
+      );
     case 'all-pipelines':
       return <AllPipelinesView />;
     case 'runs':

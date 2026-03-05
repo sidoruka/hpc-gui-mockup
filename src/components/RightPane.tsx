@@ -72,6 +72,8 @@ interface RightPaneProps {
   onCloseOtherTabs: (keepTabId: string) => void;
   onReorderTabs: (fromIndex: number, toIndex: number) => void;
   onOpenChat: () => void;
+  vscodeInjectedContent?: string | null;
+  onVscodeInjectedContentConsumed?: () => void;
 }
 
 function getTabById(tabs: Tab[], id: string | null): Tab | null {
@@ -79,10 +81,26 @@ function getTabById(tabs: Tab[], id: string | null): Tab | null {
   return tabs.find((t) => t.id === id) ?? null;
 }
 
-function SingleContent({ tab, launchedApps }: { tab: Tab; launchedApps: LaunchedApp[] }) {
+function SingleContent({
+  tab,
+  launchedApps,
+  vscodeInjectedContent,
+  onVscodeInjectedContentConsumed,
+}: {
+  tab: Tab;
+  launchedApps: LaunchedApp[];
+  vscodeInjectedContent?: string | null;
+  onVscodeInjectedContentConsumed?: () => void;
+}) {
   return (
     <div style={{ height: '100%', overflow: 'auto' }}>
-      <TabContent tabType={tab.type} tab={tab} launchedApps={launchedApps} />
+      <TabContent
+        tabType={tab.type}
+        tab={tab}
+        launchedApps={launchedApps}
+        vscodeInjectedContent={tab.type === 'vscode' ? vscodeInjectedContent : undefined}
+        onVscodeInjectedContentConsumed={tab.type === 'vscode' ? onVscodeInjectedContentConsumed : undefined}
+      />
     </div>
   );
 }
@@ -98,6 +116,8 @@ export function RightPane({
   onCloseOtherTabs,
   onReorderTabs,
   onOpenChat,
+  vscodeInjectedContent,
+  onVscodeInjectedContentConsumed,
 }: RightPaneProps) {
   const activeTab = getTabById(openTabs, activeTabId);
 
@@ -123,7 +143,12 @@ export function RightPane({
       />
       <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
         {activeTab ? (
-          <SingleContent tab={activeTab} launchedApps={launchedApps} />
+          <SingleContent
+            tab={activeTab}
+            launchedApps={launchedApps}
+            vscodeInjectedContent={vscodeInjectedContent}
+            onVscodeInjectedContentConsumed={onVscodeInjectedContentConsumed}
+          />
         ) : (
           <EmptyState onOpenChat={onOpenChat} />
         )}

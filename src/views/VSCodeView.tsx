@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
-import { Play, Bug, ChevronDown } from 'lucide-react';
+import { Play, Bug, ChevronDown, Package, Rocket } from 'lucide-react';
 
 type EditorLanguage = 'python' | 'shell' | 'dockerfile';
 
@@ -41,14 +41,30 @@ const VALID_LANGUAGES: EditorLanguage[] = ['python', 'shell', 'dockerfile'];
 interface VSCodeViewProps {
   /** When opening via "Build new app", pass 'dockerfile' so Dockerfile is selected initially */
   initialLanguage?: EditorLanguage | null;
+  /** Injected content from Chat (e.g. simulated "Create docker for python 3") */
+  injectedContent?: string;
+  /** Called after injected content has been applied so parent can clear injection */
+  onInjectedContentConsumed?: () => void;
 }
 
-export function VSCodeView({ initialLanguage }: VSCodeViewProps) {
+export function VSCodeView({
+  initialLanguage,
+  injectedContent,
+  onInjectedContentConsumed,
+}: VSCodeViewProps) {
   const initial =
     initialLanguage && VALID_LANGUAGES.includes(initialLanguage) ? initialLanguage : DEFAULT_LANGUAGE;
   const [language, setLanguage] = useState<EditorLanguage>(initial);
   const [value, setValue] = useState('');
   const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    if (injectedContent != null && injectedContent !== '') {
+      setValue(injectedContent);
+      setLanguage('dockerfile');
+      onInjectedContentConsumed?.();
+    }
+  }, [injectedContent, onInjectedContentConsumed]);
 
   const handleEditorChange = useCallback((newValue: string | undefined) => {
     setValue(newValue ?? '');
@@ -138,14 +154,29 @@ export function VSCodeView({ initialLanguage }: VSCodeViewProps) {
             </>
           )}
         </div>
-        <button type="button" style={toolbarBtn} title="Run">
-          <Play size={16} />
-          Run
-        </button>
-        <button type="button" style={toolbarBtn} title="Debug">
-          <Bug size={16} />
-          Debug
-        </button>
+        {language === 'dockerfile' ? (
+          <>
+            <button type="button" style={toolbarBtn} title="Build">
+              <Package size={16} />
+              Build
+            </button>
+            <button type="button" style={toolbarBtn} title="Deploy">
+              <Rocket size={16} />
+              Deploy
+            </button>
+          </>
+        ) : (
+          <>
+            <button type="button" style={toolbarBtn} title="Run">
+              <Play size={16} />
+              Run
+            </button>
+            <button type="button" style={toolbarBtn} title="Debug">
+              <Bug size={16} />
+              Debug
+            </button>
+          </>
+        )}
       </div>
       <div style={{ flex: 1, minHeight: 0 }}>
         <Editor
