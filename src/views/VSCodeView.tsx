@@ -10,45 +10,6 @@ const LANGUAGE_OPTIONS: { value: EditorLanguage; label: string; monacoLanguage: 
   { value: 'dockerfile', label: 'Dockerfile', monacoLanguage: 'dockerfile' },
 ];
 
-const DEFAULT_CODE: Record<EditorLanguage, string> = {
-  python: `# VSCode session on HPC login node
-# Edit this file — syntax highlighting, line numbers, full editor
-
-def greet(name: str) -> str:
-    return f"Hello, {name}!"
-
-if __name__ == "__main__":
-    message = greet("HPC")
-    print(message)
-`,
-  shell: `#!/bin/bash
-# VSCode session on HPC login node
-# Edit this file — syntax highlighting, line numbers, full editor
-
-greet() {
-    echo "Hello, $1!"
-}
-
-message=$(greet "HPC")
-echo "$message"
-`,
-  dockerfile: `# VSCode session on HPC login node
-# Edit this file — syntax highlighting, line numbers, full editor
-
-FROM node:20-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-
-FROM nginx:alpine
-COPY --from=builder /app/dist /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-`,
-};
-
 const toolbarStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
@@ -75,15 +36,18 @@ const toolbarBtn: React.CSSProperties = {
 
 const DEFAULT_LANGUAGE: EditorLanguage = 'python';
 
+const VALID_LANGUAGES: EditorLanguage[] = ['python', 'shell', 'dockerfile'];
+
 interface VSCodeViewProps {
   /** When opening via "Build new app", pass 'dockerfile' so Dockerfile is selected initially */
   initialLanguage?: EditorLanguage | null;
 }
 
 export function VSCodeView({ initialLanguage }: VSCodeViewProps) {
-  const initial = initialLanguage && DEFAULT_CODE[initialLanguage] ? initialLanguage : DEFAULT_LANGUAGE;
+  const initial =
+    initialLanguage && VALID_LANGUAGES.includes(initialLanguage) ? initialLanguage : DEFAULT_LANGUAGE;
   const [language, setLanguage] = useState<EditorLanguage>(initial);
-  const [value, setValue] = useState(DEFAULT_CODE[initial]);
+  const [value, setValue] = useState('');
   const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
 
   const handleEditorChange = useCallback((newValue: string | undefined) => {
@@ -92,7 +56,7 @@ export function VSCodeView({ initialLanguage }: VSCodeViewProps) {
 
   const handleLanguageSelect = useCallback((lang: EditorLanguage) => {
     setLanguage(lang);
-    setValue(DEFAULT_CODE[lang]);
+    setValue('');
     setLanguageDropdownOpen(false);
   }, []);
 

@@ -5,8 +5,14 @@ const placeholderMessages = [
   { role: 'assistant' as const, text: 'I can help you search and analyze your data on the HPC. Try asking about your files, datasets, or request an analysis.' },
 ];
 
-export function ChatView() {
+export interface ChatViewProps {
+  /** When true (e.g. "Build new app" flow), show no initial messages */
+  startEmpty?: boolean;
+}
+
+export function ChatView({ startEmpty }: ChatViewProps) {
   const [input, setInput] = useState('');
+  const messages = startEmpty ? [] : placeholderMessages;
 
   return (
     <div
@@ -27,7 +33,7 @@ export function ChatView() {
           gap: '16px',
         }}
       >
-        {placeholderMessages.map((msg, i) => (
+        {messages.map((msg, i) => (
           <div
             key={i}
             style={{
@@ -49,43 +55,62 @@ export function ChatView() {
         style={{
           padding: '12px 16px',
           borderTop: '1px solid var(--border-subtle)',
-          display: 'flex',
-          gap: '8px',
-          alignItems: 'center',
+          width: '100%',
         }}
       >
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask about your data or request an analysis..."
-          style={{
-            flex: 1,
-            padding: '10px 14px',
-            background: 'var(--bg-search)',
-            border: '1px solid var(--border-subtle)',
-            borderRadius: '8px',
-            color: 'var(--text-primary)',
-            fontSize: '14px',
-            outline: 'none',
-          }}
-        />
-        <button
-          type="button"
-          style={{
-            padding: '10px 14px',
-            background: 'var(--accent-chat)',
-            border: 'none',
-            borderRadius: '8px',
-            color: '#fff',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Send size={18} />
-        </button>
+        <div style={{ position: 'relative', width: '100%' }}>
+          <textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask about your data or request an analysis..."
+            rows={4}
+            style={{
+              width: '100%',
+              minHeight: 96,
+              padding: '10px 14px 40px 14px',
+              background: 'var(--bg-search)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: '8px',
+              color: 'var(--text-primary)',
+              fontSize: '14px',
+              lineHeight: 1.5,
+              outline: 'none',
+              resize: 'vertical',
+              fontFamily: 'inherit',
+              boxSizing: 'border-box',
+            }}
+          />
+          <button
+            type="button"
+            title="Send"
+            style={{
+              position: 'absolute',
+              bottom: 8,
+              right: 8,
+              width: 28,
+              height: 28,
+              padding: 0,
+              background: 'transparent',
+              border: 'none',
+              borderRadius: '6px',
+              color: 'var(--text-secondary)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'var(--bg-hover)';
+              e.currentTarget.style.color = 'var(--text-primary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.color = 'var(--text-secondary)';
+            }}
+          >
+            <Send size={16} />
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -26,7 +26,7 @@ export function TabContent({ tabType, tab, launchedApps = [] }: TabContentProps)
   }
   switch (tabType) {
     case 'chat':
-      return <ChatView />;
+      return <ChatView startEmpty={tab?.type === 'chat' ? tab.chatStartEmpty : undefined} />;
     case 'shell':
       return <ShellView />;
     case 'desktop':

@@ -75,7 +75,11 @@ function App() {
   }, []);
 
   const openApp = useCallback(
-    (type: TabType, launchedAppId?: string, options?: { vscodeInitialLanguage?: VSCodeInitialLanguage }) => {
+    (
+      type: TabType,
+      launchedAppId?: string,
+      options?: { vscodeInitialLanguage?: VSCodeInitialLanguage; chatStartEmpty?: boolean }
+    ) => {
       if (type === 'launched' && launchedAppId) {
         const title = ''; // reducer will resolve from launchedApps
         dispatch({ type: 'OPEN_APP', tabType: 'launched', title, launchedAppId });
@@ -87,6 +91,7 @@ function App() {
           ...(type === 'vscode' && options?.vscodeInitialLanguage
             ? { vscodeInitialLanguage: options.vscodeInitialLanguage }
             : {}),
+          ...(type === 'chat' && options?.chatStartEmpty ? { chatStartEmpty: options.chatStartEmpty } : {}),
         });
       }
     },
@@ -310,7 +315,7 @@ function App() {
               </button>
             </div>
             <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
-              <ChatView />
+              <ChatView startEmpty={chatTab?.chatStartEmpty} />
             </div>
           </div>
           <div

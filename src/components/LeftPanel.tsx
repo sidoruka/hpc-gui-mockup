@@ -58,7 +58,11 @@ interface LeftPanelProps {
   width?: number;
   isResizing?: boolean;
   onToggleSidebar: () => void;
-  onOpenApp: (type: TabType, launchedAppId?: string, options?: { vscodeInitialLanguage?: VSCodeInitialLanguage }) => void;
+  onOpenApp: (
+    type: TabType,
+    launchedAppId?: string,
+    options?: { vscodeInitialLanguage?: VSCodeInitialLanguage; chatStartEmpty?: boolean }
+  ) => void;
   launchedApps: LaunchedApp[];
   onLaunchApp: (catalogAppId: string) => void;
   onStopLaunchedApp: (launchedAppId: string) => void;
@@ -165,7 +169,7 @@ export function LeftPanel({
           }}
           onBuildNewApp={() => {
             setLaunchDialogOpen(false);
-            onOpenApp('chat');
+            onOpenApp('chat', undefined, { chatStartEmpty: true });
             onOpenApp('vscode', undefined, { vscodeInitialLanguage: 'dockerfile' });
           }}
         />

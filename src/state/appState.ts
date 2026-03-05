@@ -25,6 +25,8 @@ export interface Tab {
   filePath?: string;
   /** Set when type is 'vscode' — initial language for "Build new app" flow */
   vscodeInitialLanguage?: VSCodeInitialLanguage;
+  /** Set when type is 'chat' — open with no placeholder messages (e.g. "Build new app" flow) */
+  chatStartEmpty?: boolean;
 }
 
 export type LaunchedAppStatus = 'launching' | 'ready';
@@ -48,7 +50,7 @@ export interface AppState {
 }
 
 export type AppAction =
-  | { type: 'OPEN_APP'; tabType: TabType; title: string; launchedAppId?: string; filePath?: string; vscodeInitialLanguage?: VSCodeInitialLanguage }
+  | { type: 'OPEN_APP'; tabType: TabType; title: string; launchedAppId?: string; filePath?: string; vscodeInitialLanguage?: VSCodeInitialLanguage; chatStartEmpty?: boolean }
   | { type: 'LAUNCH_APP'; catalogAppId: string; launchedAppId?: string }
   | { type: 'LAUNCHED_APP_READY'; launchedAppId: string }
   | { type: 'STOP_LAUNCHED_APP'; launchedAppId: string }
@@ -115,6 +117,9 @@ export function appReducer(state: AppState, action: AppAction): AppState {
           : {}),
         ...(action.tabType === 'vscode' && action.vscodeInitialLanguage
           ? { vscodeInitialLanguage: action.vscodeInitialLanguage }
+          : {}),
+        ...(action.tabType === 'chat' && action.chatStartEmpty
+          ? { chatStartEmpty: action.chatStartEmpty }
           : {}),
       };
       return {
