@@ -36,7 +36,7 @@ export function TabContent({ tabType, tab, launchedApps = [] }: TabContentProps)
     case 'rstudio':
       return <RStudioView />;
     case 'vscode':
-      return <VSCodeView />;
+      return <VSCodeView initialLanguage={tab?.type === 'vscode' ? tab.vscodeInitialLanguage : undefined} />;
     case 'all-pipelines':
       return <AllPipelinesView />;
     case 'runs':

@@ -21,7 +21,7 @@ import {
   Snowflake,
   TreePine,
 } from 'lucide-react';
-import type { TabType, LaunchedApp } from '../state/appState';
+import type { TabType, LaunchedApp, VSCodeInitialLanguage } from '../state/appState';
 import { getTitleForType } from '../state/appState';
 import { JupyterIcon } from './icons/JupyterIcon';
 import { RStudioIcon } from './icons/RStudioIcon';
@@ -58,7 +58,7 @@ interface LeftPanelProps {
   width?: number;
   isResizing?: boolean;
   onToggleSidebar: () => void;
-  onOpenApp: (type: TabType, launchedAppId?: string) => void;
+  onOpenApp: (type: TabType, launchedAppId?: string, options?: { vscodeInitialLanguage?: VSCodeInitialLanguage }) => void;
   launchedApps: LaunchedApp[];
   onLaunchApp: (catalogAppId: string) => void;
   onStopLaunchedApp: (launchedAppId: string) => void;
@@ -166,7 +166,7 @@ export function LeftPanel({
           onBuildNewApp={() => {
             setLaunchDialogOpen(false);
             onOpenApp('chat');
-            onOpenApp('vscode');
+            onOpenApp('vscode', undefined, { vscodeInitialLanguage: 'dockerfile' });
           }}
         />
       )}

@@ -13,6 +13,8 @@ export type TabType =
   | 'common-data'
   | 'file';
 
+export type VSCodeInitialLanguage = 'python' | 'shell' | 'dockerfile';
+
 export interface Tab {
   id: string;
   type: TabType;
@@ -21,6 +23,8 @@ export interface Tab {
   launchedAppId?: string;
   /** Set when type is 'file' — virtual path e.g. my-files/documents/report.pdf */
   filePath?: string;
+  /** Set when type is 'vscode' — initial language for "Build new app" flow */
+  vscodeInitialLanguage?: VSCodeInitialLanguage;
 }
 
 export type LaunchedAppStatus = 'launching' | 'ready';
@@ -44,7 +48,7 @@ export interface AppState {
 }
 
 export type AppAction =
-  | { type: 'OPEN_APP'; tabType: TabType; title: string; launchedAppId?: string; filePath?: string }
+  | { type: 'OPEN_APP'; tabType: TabType; title: string; launchedAppId?: string; filePath?: string; vscodeInitialLanguage?: VSCodeInitialLanguage }
   | { type: 'LAUNCH_APP'; catalogAppId: string; launchedAppId?: string }
   | { type: 'LAUNCHED_APP_READY'; launchedAppId: string }
   | { type: 'STOP_LAUNCHED_APP'; launchedAppId: string }
@@ -108,6 +112,9 @@ export function appReducer(state: AppState, action: AppAction): AppState {
           : {}),
         ...(action.tabType === 'file' && action.filePath
           ? { filePath: action.filePath }
+          : {}),
+        ...(action.tabType === 'vscode' && action.vscodeInitialLanguage
+          ? { vscodeInitialLanguage: action.vscodeInitialLanguage }
           : {}),
       };
       return {

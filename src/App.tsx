@@ -16,6 +16,7 @@ import {
   generateLaunchedAppId,
   type TabType,
   type Tab,
+  type VSCodeInitialLanguage,
 } from './state/appState';
 import './styles/theme.css';
 
@@ -73,14 +74,24 @@ function App() {
     };
   }, []);
 
-  const openApp = useCallback((type: TabType, launchedAppId?: string) => {
-    if (type === 'launched' && launchedAppId) {
-      const title = ''; // reducer will resolve from launchedApps
-      dispatch({ type: 'OPEN_APP', tabType: 'launched', title, launchedAppId });
-    } else {
-      dispatch({ type: 'OPEN_APP', tabType: type, title: getTitleForType(type) });
-    }
-  }, []);
+  const openApp = useCallback(
+    (type: TabType, launchedAppId?: string, options?: { vscodeInitialLanguage?: VSCodeInitialLanguage }) => {
+      if (type === 'launched' && launchedAppId) {
+        const title = ''; // reducer will resolve from launchedApps
+        dispatch({ type: 'OPEN_APP', tabType: 'launched', title, launchedAppId });
+      } else {
+        dispatch({
+          type: 'OPEN_APP',
+          tabType: type,
+          title: getTitleForType(type),
+          ...(type === 'vscode' && options?.vscodeInitialLanguage
+            ? { vscodeInitialLanguage: options.vscodeInitialLanguage }
+            : {}),
+        });
+      }
+    },
+    []
+  );
 
   const openFile = useCallback((filePath: string) => {
     const fileName = filePath.split('/').pop() ?? filePath;
