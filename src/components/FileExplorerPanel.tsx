@@ -623,7 +623,11 @@ export function FileExplorerPanel({
         <div
           style={{
             position: 'fixed',
-            left: createSubmenuOpen && !contextMenu.isFile ? contextMenu.x - 122 : contextMenu.x,
+            left: (() => {
+              if (createSubmenuOpen && !contextMenu.isFile) return contextMenu.x - 122;
+              if (openInSubmenuOpen && contextMenu.isFile) return contextMenu.x - 142;
+              return contextMenu.x;
+            })(),
             top: contextMenu.y,
             zIndex: 10000,
             display: 'flex',
@@ -635,6 +639,65 @@ export function FileExplorerPanel({
             setOpenInSubmenuOpen(false);
           }}
         >
+          {openInSubmenuOpen && contextMenu.isFile && (
+            <div
+              role="menu"
+              style={{
+                minWidth: 140,
+                padding: 0,
+                marginRight: 2,
+                alignSelf: 'flex-start',
+                background: 'var(--bg-dropdown, #2d2d2d)',
+                border: '1px solid var(--border-subtle, #444)',
+                borderRadius: '6px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                fontSize: '13px',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              {OPEN_IN_APP_TYPES.map((type) => {
+                const Icon = OPEN_IN_APP_ICONS[type];
+                return (
+                  <button
+                    key={type}
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      if (contextMenu) onOpenApp(type, undefined, { filePath: contextMenu.fullPath });
+                      closeContextMenu();
+                    }}
+                    style={submenuItemStyle}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-hover)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                  >
+                    <Icon size={14} style={{ flexShrink: 0 }} />
+                    {getTitleForType(type)}
+                  </button>
+                );
+              })}
+              {launchedApps.map((app) => {
+                const Icon = launchableAppIconMap[app.iconKey] ?? Layers;
+                return (
+                  <button
+                    key={app.id}
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      if (contextMenu) onOpenApp('launched', app.id, { filePath: contextMenu.fullPath });
+                      closeContextMenu();
+                    }}
+                    style={submenuItemStyle}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-hover)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                  >
+                    <Icon size={14} style={{ flexShrink: 0 }} />
+                    {app.name}
+                  </button>
+                );
+              })}
+            </div>
+          )}
           {createSubmenuOpen && !contextMenu.isFile && (
             <div
               role="menu"
@@ -680,7 +743,6 @@ export function FileExplorerPanel({
             role="menu"
             style={{
               minWidth: contextMenu.isSectionHeader ? 120 : 180,
-              marginRight: openInSubmenuOpen && contextMenu.isFile ? 2 : 0,
               padding: '4px 0',
               background: 'var(--bg-dropdown, #2d2d2d)',
               border: '1px solid var(--border-subtle, #444)',
@@ -802,64 +864,6 @@ export function FileExplorerPanel({
               </>
             )}
           </div>
-          {openInSubmenuOpen && contextMenu.isFile && (
-            <div
-              role="menu"
-              style={{
-                minWidth: 140,
-                padding: 0,
-                alignSelf: 'flex-start',
-                background: 'var(--bg-dropdown, #2d2d2d)',
-                border: '1px solid var(--border-subtle, #444)',
-                borderRadius: '6px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-                fontSize: '13px',
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
-              {OPEN_IN_APP_TYPES.map((type) => {
-                const Icon = OPEN_IN_APP_ICONS[type];
-                return (
-                  <button
-                    key={type}
-                    type="button"
-                    role="menuitem"
-                    onClick={() => {
-                      if (contextMenu) onOpenApp(type, undefined, { filePath: contextMenu.fullPath });
-                      closeContextMenu();
-                    }}
-                    style={submenuItemStyle}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-hover)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                  >
-                    <Icon size={14} style={{ flexShrink: 0 }} />
-                    {getTitleForType(type)}
-                  </button>
-                );
-              })}
-              {launchedApps.map((app) => {
-                const Icon = launchableAppIconMap[app.iconKey] ?? Layers;
-                return (
-                  <button
-                    key={app.id}
-                    type="button"
-                    role="menuitem"
-                    onClick={() => {
-                      if (contextMenu) onOpenApp('launched', app.id, { filePath: contextMenu.fullPath });
-                      closeContextMenu();
-                    }}
-                    style={submenuItemStyle}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-hover)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                  >
-                    <Icon size={14} style={{ flexShrink: 0 }} />
-                    {app.name}
-                  </button>
-                );
-              })}
-            </div>
-          )}
         </div>
       )}
       <div
