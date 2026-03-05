@@ -265,7 +265,7 @@ export function LeftPanel({
                 alignItems: 'center',
                 gap: '12px',
                 padding: '4px 12px',
-                margin: '0 8px',
+                margin: 0,
                 borderRadius: '6px',
                 background: 'transparent',
                 border: 'none',
