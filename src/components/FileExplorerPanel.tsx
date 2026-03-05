@@ -15,8 +15,16 @@ import {
   Pencil,
   Trash2,
   Upload,
+  Terminal,
+  Monitor,
+  Layers,
 } from 'lucide-react';
-import type { TabType } from '../state/appState';
+import type { TabType, LaunchedApp } from '../state/appState';
+import { getTitleForType } from '../state/appState';
+import { JupyterIcon } from './icons/JupyterIcon';
+import { RStudioIcon } from './icons/RStudioIcon';
+import { VSCodeIcon } from './icons/VSCodeIcon';
+import { launchableAppIconMap } from './launchableAppIcons';
 
 export type FileTreeNode = {
   name: string;
@@ -151,14 +159,26 @@ function addChildToTree(nodes: FileTreeNode[], pathParts: string[], child: FileT
   });
 }
 
+/** Built-in app types that can be targeted by "Open in" (excludes chat, file browser, pipelines) */
+const OPEN_IN_APP_TYPES: TabType[] = ['shell', 'desktop', 'jupyter', 'rstudio', 'vscode'];
+
+const OPEN_IN_APP_ICONS: Record<(typeof OPEN_IN_APP_TYPES)[number], React.ElementType> = {
+  shell: Terminal,
+  desktop: Monitor,
+  jupyter: JupyterIcon,
+  rstudio: RStudioIcon,
+  vscode: VSCodeIcon,
+};
+
 interface FileExplorerPanelProps {
   collapsed: boolean;
   width: number;
   isResizing?: boolean;
   onToggleSidebar: () => void;
-  onOpenApp: (type: TabType) => void;
+  onOpenApp: (type: TabType, launchedAppId?: string, options?: { filePath?: string }) => void;
   /** Open a file from the tree in the main pane (path e.g. my-files/documents/report.pdf) */
   onOpenFile?: (filePath: string) => void;
+  launchedApps: LaunchedApp[];
 }
 
 const DEFAULT_WIDTH = 260;
@@ -318,6 +338,7 @@ export function FileExplorerPanel({
   onToggleSidebar,
   onOpenApp,
   onOpenFile,
+  launchedApps,
 }: FileExplorerPanelProps) {
   const [sectionsExpanded, setSectionsExpanded] = useState<Record<DataSectionId, boolean>>({
     'my-files': false,
@@ -328,10 +349,12 @@ export function FileExplorerPanel({
   const [treeData, setTreeData] = useState<Record<DataSectionId, FileTreeNode[]>>(initialTree);
   const [contextMenu, setContextMenu] = useState<ContextMenuState>(null);
   const [createSubmenuOpen, setCreateSubmenuOpen] = useState(false);
+  const [openInSubmenuOpen, setOpenInSubmenuOpen] = useState(false);
 
   const closeContextMenu = useCallback(() => {
     setContextMenu(null);
     setCreateSubmenuOpen(false);
+    setOpenInSubmenuOpen(false);
   }, []);
 
   useEffect(() => {
@@ -607,7 +630,10 @@ export function FileExplorerPanel({
             flexDirection: 'row',
           }}
           onClick={(e) => e.stopPropagation()}
-          onMouseLeave={() => setCreateSubmenuOpen(false)}
+          onMouseLeave={() => {
+            setCreateSubmenuOpen(false);
+            setOpenInSubmenuOpen(false);
+          }}
         >
           {createSubmenuOpen && !contextMenu.isFile && (
             <div
@@ -654,6 +680,7 @@ export function FileExplorerPanel({
             role="menu"
             style={{
               minWidth: contextMenu.isSectionHeader ? 120 : 180,
+              marginRight: openInSubmenuOpen && contextMenu.isFile ? 2 : 0,
               padding: '4px 0',
               background: 'var(--bg-dropdown, #2d2d2d)',
               border: '1px solid var(--border-subtle, #444)',
@@ -662,6 +689,24 @@ export function FileExplorerPanel({
               fontSize: '13px',
             }}
           >
+            {contextMenu.isFile && (
+              <>
+                <button
+                  type="button"
+                  role="menuitem"
+                  style={{ ...menuItemStyle, justifyContent: 'space-between' }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'var(--bg-hover)';
+                    setOpenInSubmenuOpen(true);
+                  }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                >
+                  Open in
+                  <ChevronRight size={14} style={{ flexShrink: 0 }} />
+                </button>
+                <div style={{ height: 1, background: 'var(--border-subtle, #444)', margin: '4px 8px' }} />
+              </>
+            )}
             {!contextMenu.isSectionHeader && !contextMenu.isFile && (
               <button
                 type="button"
@@ -757,6 +802,64 @@ export function FileExplorerPanel({
               </>
             )}
           </div>
+          {openInSubmenuOpen && contextMenu.isFile && (
+            <div
+              role="menu"
+              style={{
+                minWidth: 140,
+                padding: 0,
+                alignSelf: 'flex-start',
+                background: 'var(--bg-dropdown, #2d2d2d)',
+                border: '1px solid var(--border-subtle, #444)',
+                borderRadius: '6px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                fontSize: '13px',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              {OPEN_IN_APP_TYPES.map((type) => {
+                const Icon = OPEN_IN_APP_ICONS[type];
+                return (
+                  <button
+                    key={type}
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      if (contextMenu) onOpenApp(type, undefined, { filePath: contextMenu.fullPath });
+                      closeContextMenu();
+                    }}
+                    style={submenuItemStyle}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-hover)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                  >
+                    <Icon size={14} style={{ flexShrink: 0 }} />
+                    {getTitleForType(type)}
+                  </button>
+                );
+              })}
+              {launchedApps.map((app) => {
+                const Icon = launchableAppIconMap[app.iconKey] ?? Layers;
+                return (
+                  <button
+                    key={app.id}
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      if (contextMenu) onOpenApp('launched', app.id, { filePath: contextMenu.fullPath });
+                      closeContextMenu();
+                    }}
+                    style={submenuItemStyle}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-hover)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                  >
+                    <Icon size={14} style={{ flexShrink: 0 }} />
+                    {app.name}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
       <div

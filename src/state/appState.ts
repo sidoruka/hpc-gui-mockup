@@ -112,9 +112,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
         ...(action.tabType === 'launched' && action.launchedAppId
           ? { launchedAppId: action.launchedAppId }
           : {}),
-        ...(action.tabType === 'file' && action.filePath
-          ? { filePath: action.filePath }
-          : {}),
+        ...(action.filePath ? { filePath: action.filePath } : {}),
         ...(action.tabType === 'vscode' && action.vscodeInitialLanguage
           ? { vscodeInitialLanguage: action.vscodeInitialLanguage }
           : {}),

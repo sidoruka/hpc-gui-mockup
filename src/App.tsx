@@ -79,16 +79,17 @@ function App() {
     (
       type: TabType,
       launchedAppId?: string,
-      options?: { vscodeInitialLanguage?: VSCodeInitialLanguage; chatStartEmpty?: boolean }
+      options?: { vscodeInitialLanguage?: VSCodeInitialLanguage; chatStartEmpty?: boolean; filePath?: string }
     ) => {
       if (type === 'launched' && launchedAppId) {
         const title = ''; // reducer will resolve from launchedApps
-        dispatch({ type: 'OPEN_APP', tabType: 'launched', title, launchedAppId });
+        dispatch({ type: 'OPEN_APP', tabType: 'launched', title, launchedAppId, ...(options?.filePath && { filePath: options.filePath }) });
       } else {
         dispatch({
           type: 'OPEN_APP',
           tabType: type,
           title: getTitleForType(type),
+          ...(options?.filePath ? { filePath: options.filePath } : {}),
           ...(type === 'vscode' && options?.vscodeInitialLanguage
             ? { vscodeInitialLanguage: options.vscodeInitialLanguage }
             : {}),
@@ -390,6 +391,7 @@ function App() {
         onToggleSidebar={() => dispatch({ type: 'TOGGLE_RIGHT_SIDEBAR' })}
         onOpenApp={openApp}
         onOpenFile={openFile}
+        launchedApps={state.launchedApps}
       />
     </div>
   );
