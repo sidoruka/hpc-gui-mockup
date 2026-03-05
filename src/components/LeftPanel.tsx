@@ -163,7 +163,11 @@ export function LeftPanel({
             onLaunchApp(catalogAppId);
             setLaunchDialogOpen(false);
           }}
-          onBuildNewApp={() => setLaunchDialogOpen(false)}
+          onBuildNewApp={() => {
+            setLaunchDialogOpen(false);
+            onOpenApp('chat');
+            onOpenApp('vscode');
+          }}
         />
       )}
       {usageStatsOpen && (
