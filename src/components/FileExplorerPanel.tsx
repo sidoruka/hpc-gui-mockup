@@ -160,9 +160,10 @@ function addChildToTree(nodes: FileTreeNode[], pathParts: string[], child: FileT
 }
 
 /** Built-in app types that can be targeted by "Open in" (excludes chat, file browser, pipelines) */
-const OPEN_IN_APP_TYPES: TabType[] = ['shell', 'desktop', 'jupyter', 'rstudio', 'vscode'];
+const OPEN_IN_APP_TYPES = ['shell', 'desktop', 'jupyter', 'rstudio', 'vscode'] as const;
+type OpenInAppType = (typeof OPEN_IN_APP_TYPES)[number];
 
-const OPEN_IN_APP_ICONS: Record<(typeof OPEN_IN_APP_TYPES)[number], React.ElementType> = {
+const OPEN_IN_APP_ICONS: Record<OpenInAppType, React.ElementType> = {
   shell: Terminal,
   desktop: Monitor,
   jupyter: JupyterIcon,
